@@ -1,0 +1,47 @@
+﻿using Microsoft.Xna.Framework.Content;
+using Microsoft.Xna.Framework.Graphics;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+
+namespace PASS3V4
+{
+    public class Assets
+    {
+        public static ContentManager Content { get; set; }
+
+        private static string loadPath; // path to load assets from
+
+        // fonts
+
+
+        // images
+        public static Texture2D pixels;
+
+        // audio
+
+
+        // songs
+
+        /// <summary>
+        /// method loads all assets to the game
+        /// </summary>
+        public static void Initialize()
+        {
+            // load all images
+            loadPath = "Images/Sprites";
+
+            pixels = Load<Texture2D>("BlankPixel");
+        }
+
+        /// <summary>
+        /// method loads an asset
+        /// </summary>
+        /// <typeparam name="T"></typeparam> the type of the asset
+        /// <param name="file"></param> file to load
+        /// <returns></returns>
+        private static T Load<T>(string file) => Content.Load<T>($"{loadPath}/{file}");
+    }
+}
