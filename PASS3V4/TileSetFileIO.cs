@@ -94,7 +94,7 @@ namespace PASS3V4
             switch (name)
             {
                 case "Collision":
-                    tileDict[currentTileId].IsCollision = true;
+                    tileDict[currentTileId].IsCollision = bool.Parse(data.GetParameters()["value"]);
                     break;
                 case "Damage":
                     tileDict[currentTileId].Damage = int.Parse(data.GetParameters()["value"]);

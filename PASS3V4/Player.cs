@@ -56,18 +56,16 @@ namespace PASS3V4
 
         private List<Vector2> breadCrumbs = new List<Vector2>();
 
-        private bool DEBUG = true;
 
 
-
-        public Player(ContentManager content, GraphicsDevice graphicsDevice, string filePath)
+        public Player(ContentManager content, GraphicsDevice graphicsDevice, string csvFilePath)
         {
             Content = content;
 
             this.graphicsDevice = graphicsDevice;
 
             // Load animations
-            anim = Animation.LoadAnimations("AnimationSheets/" + filePath, content);
+            anim = Animation.LoadAnimations("AnimationSheets/" + csvFilePath, content);
 
             hurtBox = new Rectangle(HURT_BOX_OFFSET_X, HURT_BOX_OFFSET_Y, HURT_BOX_WIDTH, HURT_BOX_HEIGHT);
 
@@ -182,7 +180,7 @@ namespace PASS3V4
 
 
 
-        public void Draw(SpriteBatch spriteBatch)
+        public void Draw(SpriteBatch spriteBatch, bool debug = false)
         {
             if (direction == LEFT)
             {
@@ -193,7 +191,7 @@ namespace PASS3V4
                 anim[(int)state].Draw(spriteBatch, Color.White);
             }
 
-            if (DEBUG)
+            if (debug)
             {
                 debugHurtBox.Draw(spriteBatch, Color.Blue * 0.5f, true);
 

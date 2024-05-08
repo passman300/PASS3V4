@@ -14,6 +14,7 @@ namespace PASS3V4
         private SpriteBatch spriteBatch;
 
         TileMap room;
+        Player player;
 
         public Game1()
         {
@@ -42,6 +43,7 @@ namespace PASS3V4
 
             room = new TileMap("Tiled/BasicRoom.tmx", GraphicsDevice);
 
+            player = new Player(Content, GraphicsDevice, "Player/Player.csv");
             // TODO: use this.Content to load your game content here
         }
 
@@ -51,7 +53,7 @@ namespace PASS3V4
                 Exit();
 
             // TODO: Add your update logic here
-
+            player.Update(gameTime, Keyboard.GetState(), Keyboard.GetState());
             room.Update(gameTime);
             base.Update(gameTime);
         }
@@ -59,11 +61,13 @@ namespace PASS3V4
         protected override void Draw(GameTime gameTime)
         {
             GraphicsDevice.Clear(Color.CornflowerBlue);
-
+             
             // TODO: Add your drawing code here
 
             spriteBatch.Begin();
             room.Draw(spriteBatch);
+
+            player.Draw(spriteBatch);
             spriteBatch.End();
             base.Draw(gameTime);
         }

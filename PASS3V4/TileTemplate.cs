@@ -25,15 +25,15 @@ namespace PASS3V4
 
         }
 
-        public void SetAllProperties(bool isCollision, int damage, bool isAnimated, int animationDur)
-        {
-            IsCollision = isCollision;
+        //public void SetAllProperties(bool isCollision, int damage, bool isAnimated, int animationDur)
+        //{
+        //    IsCollision = isCollision;
 
-            Damage = damage;
+        //    Damage = damage;
 
-            IsAnimated = isAnimated;
+        //    IsAnimated = isAnimated;
 
-            AnimationDur = animationDur;
-        }
+        //    AnimationDur = animationDur;
+        //}
     }
 }

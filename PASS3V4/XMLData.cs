@@ -45,14 +45,14 @@ namespace PASS3V4
                 line = line.Substring(2, line.Length - 3);
             }
 
-            else if (line[0] == '<' && line[line.Length - 1] == '>')
+            else if (line[0] == '<' && line[^1] == '>')
             {
                 isHeader = true;
                 isFooter = false;
                 isOneLine = false;
                 notXML = false;
 
-                line = line.Substring(1, line.Length - 2);
+                line = line[1..^1];
             }
 
             FormatData(line);
@@ -74,7 +74,7 @@ namespace PASS3V4
             }
         }
 
-        private Tuple<string, string> SplitParameter(string parameter)
+        private static Tuple<string, string> SplitParameter(string parameter)
         {
 
             string id = parameter.Split('=')[0];

@@ -31,7 +31,7 @@ namespace PASS3V4
 
         private int curFrame;
 
-        GameRectangle temp;
+        private GameRectangle degbugHitBox;
 
         public Tile(GraphicsDevice graphicsDevice, Texture2D tileSetImg, int tileID, Vector3 position, TileTemplate tileTemplate)
         {
@@ -51,26 +51,26 @@ namespace PASS3V4
 
             // set up the hitbox
             hitBox = new Rectangle((int)position.X, (int)position.Y, WIDTH, HEIGHT);
-            temp = new GameRectangle(graphicsDevice, hitBox);
+            degbugHitBox = new GameRectangle(graphicsDevice, hitBox);
         }
 
-        public Tile(GraphicsDevice graphicsDevice, Texture2D tileSetImg, OrderedSet<int> tileIDs, Vector3 position, bool isCollidable, int collisionDamage, int animDuration)
-        {
-            this.tileID = tileIDs;
+        //public Tile(GraphicsDevice graphicsDevice, Texture2D tileSetImg, OrderedSet<int> tileIDs, Vector3 position, bool isCollidable, int collisionDamage, int animDuration)
+        //{
+        //    this.tileID = tileIDs;
 
-            properties[Properties.Collision] = isCollidable;
-            this.collisionDamage = collisionDamage;
+        //    properties[Properties.Collision] = isCollidable;
+        //    this.collisionDamage = collisionDamage;
 
-            properties[Properties.Animated] = true;
-            frameDuration = new Timer(animDuration, true);
-            curFrame = 0;
+        //    properties[Properties.Animated] = true;
+        //    frameDuration = new Timer(animDuration, true);
+        //    curFrame = 0;
 
-            // set up the tile image
-            SetTileImages(graphicsDevice, tileSetImg, tileID);
+        //    // set up the tile image
+        //    SetTileImages(graphicsDevice, tileSetImg, tileID);
 
-            // set up the hitbox
-            hitBox = new Rectangle((int)position.X, (int)position.Y, WIDTH, HEIGHT);
-        }
+        //    // set up the hitbox
+        //    hitBox = new Rectangle((int)position.X, (int)position.Y, WIDTH, HEIGHT);
+        //}
 
         private void SetTileImages(GraphicsDevice graphicsDevice, Texture2D tileSetImg, OrderedSet<int> tileID)
         {
@@ -116,7 +116,7 @@ namespace PASS3V4
             {
                 if (properties[Properties.Collision])
                 {
-                    temp.Draw(spriteBatch, Color.Red, false);
+                    degbugHitBox.Draw(spriteBatch, Color.Red, false);
                 }
             }
         }
