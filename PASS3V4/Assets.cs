@@ -19,6 +19,7 @@ namespace PASS3V4
 
         // images
         public static Texture2D pixels;
+        public static Texture2D dungeonTileSetImg;
 
         // audio
 
@@ -34,6 +35,9 @@ namespace PASS3V4
             loadPath = "Images/Sprites";
 
             pixels = Load<Texture2D>("BlankPixel");
+
+            loadPath = "Images/Tileset";
+            dungeonTileSetImg = Load<Texture2D>("32x32DungeonTileSetImage");
         }
 
         /// <summary>

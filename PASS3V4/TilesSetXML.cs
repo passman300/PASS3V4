@@ -10,7 +10,7 @@ using System.Xml;
 
 namespace PASS3V4
 {
-    public class TileSet
+    public class TileSetXML
     {
         private string name;
         private string filePath;
@@ -31,12 +31,12 @@ namespace PASS3V4
         private string currentToken;
         private XmlReader reader;
 
-        public TileSet(string filePath)
+        public TileSetXML(string filePath)
         {
             this.filePath = filePath;
         }
 
-        public void LoadTilesXML()
+        /*        public void LoadTilesXML()
         {
             using (FileStream stream = System.IO.File.OpenRead(filePath))
             {
@@ -61,6 +61,7 @@ namespace PASS3V4
                                     break;
                                 case "tile":
                                     ReadTileData();
+                                    break;
                             }
                         }
                     }
@@ -171,7 +172,7 @@ namespace PASS3V4
 
 
 
-
+        */
 
     }
 }

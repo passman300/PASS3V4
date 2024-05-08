@@ -106,10 +106,10 @@ namespace PASS3V4
             else
             {
                 // movement: up, down, left, right
-                byte up = kb.IsKeyDown(Keys.W) ? (byte)1 : (byte)0;
-                byte down = kb.IsKeyDown(Keys.S) ? (byte)1 : (byte)0;
-                byte left = kb.IsKeyDown(Keys.A) ? (byte)1 : (byte)0;
-                byte right = kb.IsKeyDown(Keys.D) ? (byte)1 : (byte)0;
+                byte up = (byte)(kb.IsKeyDown(Keys.W) ? 1 : 0);
+                byte down = (byte)(kb.IsKeyDown(Keys.S) ? 1 : 0);
+                byte left = (byte)(kb.IsKeyDown(Keys.A) ? 1 : 0);
+                byte right = (byte)(kb.IsKeyDown(Keys.D) ? 1 : 0);
 
                 if (left == 1 && right == 0) direction = LEFT;
                 if (right == 1 && left == 0) direction = RIGHT;

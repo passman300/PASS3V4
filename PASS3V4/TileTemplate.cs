@@ -1,9 +1,6 @@
 ﻿using Microsoft.Xna.Framework.Graphics;
-using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+
 
 namespace PASS3V4
 {
@@ -11,12 +8,21 @@ namespace PASS3V4
     {
         public bool IsCollision { get; set; }
         public int Damage { get; set; }
-
         public bool IsAnimated { get; set; }
         public int AnimationDur { get; set; }
+        public Texture2D Image { get; set; }
+
+        private OrderedSet<int> frames = new OrderedSet<int>();
+
+        public OrderedSet<int> Frames
+        {
+            get { return frames; }
+            set { frames = value; }
+        }
 
         public TileTemplate()
         {
+
         }
 
         public void SetAllProperties(bool isCollision, int damage, bool isAnimated, int animationDur)

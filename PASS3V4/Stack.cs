@@ -30,5 +30,10 @@ namespace PASS3V4
         {
             stack.Add(item);
         }
+
+        public int Count()
+        {
+            return stack.Count;
+        }
     }
 }

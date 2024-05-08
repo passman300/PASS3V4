@@ -1,17 +1,23 @@
 ﻿using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
+using System;
 
 namespace PASS3V4
 {
     public class Game1 : Game
     {
-        private GraphicsDeviceManager _graphics;
-        private SpriteBatch _spriteBatch;
+        private const int SCREEN_WIDTH = 960;
+        private const int SCREEN_HEIGHT = 800;
+
+        private GraphicsDeviceManager graphics;
+        private SpriteBatch spriteBatch;
+
+        TileMap room;
 
         public Game1()
         {
-            _graphics = new GraphicsDeviceManager(this);
+            graphics = new GraphicsDeviceManager(this);
             Content.RootDirectory = "Content";
             IsMouseVisible = true;
         }
@@ -19,13 +25,22 @@ namespace PASS3V4
         protected override void Initialize()
         {
             // TODO: Add your initialization logic here
+            graphics.PreferredBackBufferWidth = SCREEN_WIDTH;
+            graphics.PreferredBackBufferHeight = SCREEN_HEIGHT;
 
+            // apply the graphics change
+            graphics.ApplyChanges();
             base.Initialize();
         }
 
         protected override void LoadContent()
         {
-            _spriteBatch = new SpriteBatch(GraphicsDevice);
+            spriteBatch = new SpriteBatch(GraphicsDevice);
+
+            Assets.Content = Content;
+            Assets.Initialize();
+
+            room = new TileMap("Tiled/BasicRoom.tmx", GraphicsDevice);
 
             // TODO: use this.Content to load your game content here
         }
@@ -37,6 +52,7 @@ namespace PASS3V4
 
             // TODO: Add your update logic here
 
+            room.Update(gameTime);
             base.Update(gameTime);
         }
 
@@ -46,6 +62,9 @@ namespace PASS3V4
 
             // TODO: Add your drawing code here
 
+            spriteBatch.Begin();
+            room.Draw(spriteBatch);
+            spriteBatch.End();
             base.Draw(gameTime);
         }
     }

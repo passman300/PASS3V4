@@ -1,15 +1,7 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using GameUtility;
-
+﻿using GameUtility;
 using Microsoft.Xna.Framework;
-using Microsoft.Xna.Framework.Content;
 using Microsoft.Xna.Framework.Graphics;
-using Microsoft.Xna.Framework.Input;
-using Animation = GameUtility.Animation;
+using System.Collections.Generic;
 
 namespace PASS3V4
 {
@@ -21,20 +13,17 @@ namespace PASS3V4
             Animated
         }
 
-        const int WIDTH = 32;
-        const int HEIGHT = 32;
+        public const int WIDTH = 32;
+        public const int HEIGHT = 32;
 
-        private Texture2D tileSetImg;
         private List<Texture2D> tileImg = new List<Texture2D>();
 
         private int tileIDperRow;
-        private List<int> tileID = new List<int>();
-
-        private Vector3 position; // x, y, z (layer)
+        private OrderedSet<int> tileID = new OrderedSet<int>();
 
         private Rectangle hitBox;
 
-        private Dictionary<Properties, bool> properties;
+        private Dictionary<Properties, bool> properties = new Dictionary<Properties, bool>();
 
         private int collisionDamage;
 
@@ -42,18 +31,19 @@ namespace PASS3V4
 
         private int curFrame;
 
-        public Tile(GraphicsDevice graphicsDevice, Texture2D tileSetImg, int tileID, Vector3 position, bool isCollidable, int collisionDamage)
+        GameRectangle temp;
+
+        public Tile(GraphicsDevice graphicsDevice, Texture2D tileSetImg, int tileID, Vector3 position, TileTemplate tileTemplate)
         {
-            (this.tileID).Add(tileID);
+            if (tileTemplate.Frames.Count > 0)
+                this.tileID = tileTemplate.Frames;
+            this.tileID.Add(tileID);
 
-            this.position = position;
+            properties[Properties.Collision] = tileTemplate.IsCollision;
+            this.collisionDamage = tileTemplate.Damage;
 
-            properties[Properties.Collision] = isCollidable;
-            this.collisionDamage = collisionDamage;
-
-            // set all animation properties and variables to false, or 0
-            properties[Properties.Animated] = false;
-            frameDuration = new Timer(0, false);
+            properties[Properties.Animated] = tileTemplate.IsAnimated;
+            frameDuration = new Timer(tileTemplate.AnimationDur, true);
             curFrame = 0;
 
             // set up the tile image
@@ -61,13 +51,12 @@ namespace PASS3V4
 
             // set up the hitbox
             hitBox = new Rectangle((int)position.X, (int)position.Y, WIDTH, HEIGHT);
+            temp = new GameRectangle(graphicsDevice, hitBox);
         }
 
-        public Tile(GraphicsDevice graphicsDevice, Texture2D tileSetImg, List<int> tileIDs, Vector3 position, bool isCollidable, int collisionDamage, int animDuration)
+        public Tile(GraphicsDevice graphicsDevice, Texture2D tileSetImg, OrderedSet<int> tileIDs, Vector3 position, bool isCollidable, int collisionDamage, int animDuration)
         {
             this.tileID = tileIDs;
-
-            this.position = position;
 
             properties[Properties.Collision] = isCollidable;
             this.collisionDamage = collisionDamage;
@@ -83,18 +72,21 @@ namespace PASS3V4
             hitBox = new Rectangle((int)position.X, (int)position.Y, WIDTH, HEIGHT);
         }
 
-        private void SetTileImages(GraphicsDevice graphicsDevice, Texture2D tileSetImg, List<int> tileID)
+        private void SetTileImages(GraphicsDevice graphicsDevice, Texture2D tileSetImg, OrderedSet<int> tileID)
         {
             tileIDperRow = tileSetImg.Width / WIDTH;
 
+            Rectangle sourceRec = new Rectangle(0, 0, WIDTH, HEIGHT);
 
-            for (int i = 0; i < tileID.Count; i++)
+            foreach (int t in tileID)
             {
                 // note: tileID, row and col is 0 indexed
-                int row = tileID[i] / tileIDperRow;
-                int col = tileID[i] % tileIDperRow;
+                int row = t / tileIDperRow;
+                int col = t % tileIDperRow;
 
-                Rectangle sourceRec = new Rectangle(col * WIDTH, row * HEIGHT, WIDTH, HEIGHT);
+                //Rectangle sourceRec = new Rectangle(col * WIDTH, row * HEIGHT, WIDTH, HEIGHT);
+                sourceRec.X = col * WIDTH;
+                sourceRec.Y = row * HEIGHT;
 
                 tileImg.Add(new Texture2D(graphicsDevice, WIDTH, HEIGHT));
                 Color[] data = new Color[WIDTH * HEIGHT];
@@ -103,22 +95,30 @@ namespace PASS3V4
             }
         }
 
-        private void Update(GameTime gameTime)
+        public void Update(GameTime gameTime)
         {
-            if (properties[Properties.Animated])
-            {
-                frameDuration.Update(gameTime);
+            frameDuration.Update(gameTime);
 
-                if (frameDuration.IsFinished())
-                {
-                    curFrame = (curFrame + 1) % tileID.Count;
-                }
+            if (properties[Properties.Animated] && frameDuration.IsFinished())
+            {
+                curFrame = (curFrame + 1) % tileID.Count;
+
+                frameDuration.ResetTimer(true);
             }
         }
 
-        public void Draw(SpriteBatch spriteBatch)
+        public void Draw(SpriteBatch spriteBatch, bool debug = false)
         {
             spriteBatch.Draw(tileImg[curFrame], hitBox, Color.White);
+
+
+            if (debug)
+            {
+                if (properties[Properties.Collision])
+                {
+                    temp.Draw(spriteBatch, Color.Red, false);
+                }
+            }
         }
 
 
