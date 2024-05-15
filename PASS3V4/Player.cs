@@ -59,7 +59,6 @@ namespace PASS3V4
             hurtBox = new Rectangle((int)(HURT_BOX_OFFSET_X + position.X), (int)(HURT_BOX_OFFSET_Y + position.Y), HURT_BOX_WIDTH, HURT_BOX_HEIGHT);
 
             feetRec = new Rectangle(hurtBox.X + FEET_OFFSET_X, hurtBox.Y + FEET_OFFSET_Y, FEET_WIDTH, FEET_HEIGHT);
-            feetRecs = new FeetRecs(feetRec.Location.ToVector2());
 
             debugHurtBox = new GameRectangle(graphicsDevice, hurtBox.X, hurtBox.Y, hurtBox.Width, hurtBox.Height);
 
@@ -94,8 +93,7 @@ namespace PASS3V4
 
         private void UpdateWalk(GameTime gameTime, KeyboardState kb, Rectangle[] wallRecs)
         {
-            if (!kb.IsKeyDown(Keys.W) && !kb.IsKeyDown(Keys.S) && !kb.IsKeyDown(Keys.A) && !kb.IsKeyDown(Keys.D)) state = State.Idle;
-            else
+            if ((kb.IsKeyDown(Keys.W) != kb.IsKeyDown(Keys.S)) || (kb.IsKeyDown(Keys.A) != kb.IsKeyDown(Keys.D)))
             {
                 // movement: up, down, left, right
                 byte up = (byte)(kb.IsKeyDown(Keys.W) ? 1 : 0);
@@ -104,7 +102,9 @@ namespace PASS3V4
                 byte right = (byte)(kb.IsKeyDown(Keys.D) ? 1 : 0);
 
                 if (left == 1 && right == 0) direction = LEFT;
-                if (right == 1 && left == 0) direction = RIGHT;
+                else if (right == 1 && left == 0) direction = RIGHT;
+
+
 
                 velocity.X = right - left;
                 velocity.Y = down - up;
@@ -122,6 +122,7 @@ namespace PASS3V4
                     breadCrumbs.RemoveAt(0);
                 }
             }
+            else state = State.Idle;
         }
 
         private void Move(Rectangle[] wallRecs, float x, float y)
@@ -163,9 +164,6 @@ namespace PASS3V4
                 feetRec.X = (int)(hurtBox.X + HURT_BOX_WIDTH - FEET_WIDTH - FEET_OFFSET_X);
                 feetRec.Y = (int)(hurtBox.Y + FEET_OFFSET_Y);
             }
-
-
-            feetRecs.Update(feetRec.Location.ToVector2());
 
             centerPosition = hurtBox.Center.ToVector2();
 
@@ -259,6 +257,12 @@ namespace PASS3V4
                 }
             }
 
+            if (Math.Abs(newX) > speed)
+                newX = 0;
+
+            if (Math.Abs(newY) > speed)
+                newY = 0;
+
             return Tuple.Create(isCollided, new Vector2(newX, newY));
         }
 
@@ -275,21 +279,21 @@ namespace PASS3V4
 
             if (true)
             {
-                debugHurtBox.Draw(spriteBatch, Color.Blue * 0.5f, false);
-                debugFeetBox.Draw(spriteBatch, Color.Green, false);
-                debugAnimBox.Draw(spriteBatch, Color.Black * 0.5f, false);
-
-                spriteBatch.Draw(Assets.pixels, feetRecs.leftRec, Color.Red);
-                spriteBatch.Draw(Assets.pixels, feetRecs.rightRec, Color.Blue);
-                spriteBatch.Draw(Assets.pixels, feetRecs.topRec, Color.Green);
-                //spriteBatch.Draw(Assets.pixels, feetRecs.bottomRec, Color.Orange);
-
                 spriteBatch.DrawString(Assets.debugFont, string.Format(" position: X: {0}, Y: {1}", position.X, position.Y), new Vector2(10, 10), Color.White);
 
-                foreach (Vector2 v in breadCrumbs)
+                if (false)
                 {
-                    spriteBatch.Draw(Assets.pixels, new Rectangle((int)v.X, (int)v.Y, 3, 3), Color.Red);
+                    debugHurtBox.Draw(spriteBatch, Color.Blue * 0.5f, false);
+                    debugFeetBox.Draw(spriteBatch, Color.Green, false);
+                    debugAnimBox.Draw(spriteBatch, Color.Black * 0.5f, false);
+
+
+                    foreach (Vector2 v in breadCrumbs)
+                    {
+                        spriteBatch.Draw(Assets.pixels, new Rectangle((int)v.X, (int)v.Y, 3, 3), Color.Red);
+                    }
                 }
+                
             }
 
 

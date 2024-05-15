@@ -16,39 +16,6 @@ namespace PASS3V4
 {
     public class Entity
     {
-        public struct FeetRecs
-        {
-            private const int RL_WIDTH = 6;
-            private const int RL_HEIGHT = 7;
-            private const int TB_WIDTH = 20;
-            private const int TB_HEIGHT = 5;
-
-            private const int RL_OFFSET_X = 0;
-            private const int RL_OFFSET_Y = 2;
-            private const int TB_OFFSET_X = 6;
-            private const int TB_OFFSET_Y = 0;
-
-            public Rectangle leftRec { get; private set; }
-            public Rectangle rightRec { get; private set; }
-            public Rectangle topRec { get; private set; }
-            public Rectangle bottomRec { get; private set; }
-
-            public FeetRecs(Vector2 position)
-            {
-                leftRec = new Rectangle((int)position.X + RL_OFFSET_X, (int)position.Y + RL_OFFSET_Y, RL_WIDTH, RL_HEIGHT);
-                rightRec = new Rectangle(leftRec.Right + RL_OFFSET_X + TB_WIDTH, (int)position.Y + RL_OFFSET_Y, RL_WIDTH, RL_HEIGHT);
-                topRec = new Rectangle((int)position.X + TB_OFFSET_X, (int)position.Y + TB_OFFSET_Y, TB_WIDTH, TB_HEIGHT);
-                bottomRec = new Rectangle((int)position.X + TB_OFFSET_X, (int)position.Y + TB_OFFSET_Y + TB_HEIGHT, TB_WIDTH, TB_HEIGHT);
-            }
-            public void Update(Vector2 position)
-            {
-                leftRec = new Rectangle((int)position.X + RL_OFFSET_X, (int)position.Y + RL_OFFSET_Y, RL_WIDTH, RL_HEIGHT);
-                rightRec = new Rectangle(leftRec.Right + RL_OFFSET_X + TB_WIDTH, (int)position.Y + RL_OFFSET_Y, RL_WIDTH, RL_HEIGHT);
-                topRec = new Rectangle((int)position.X + TB_OFFSET_X, (int)position.Y + TB_OFFSET_Y, TB_WIDTH, TB_HEIGHT);
-                bottomRec = new Rectangle((int)position.X + TB_OFFSET_X, (int)position.Y + TB_OFFSET_Y + TB_HEIGHT, TB_WIDTH, TB_HEIGHT);
-            }
-        }
-
         protected const byte LEFT = 0;
         protected const byte RIGHT = 1;
 
@@ -60,7 +27,6 @@ namespace PASS3V4
 
         protected Rectangle hurtBox;
         protected Rectangle feetRec;
-        protected FeetRecs feetRecs;
 
         protected GameRectangle debugHurtBox;
         protected GameRectangle debugAnimBox;
