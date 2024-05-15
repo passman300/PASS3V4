@@ -1,10 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using System.Xml;
 using System.IO;
+using Microsoft.Xna.Framework;
+using Microsoft.Xna.Framework.Graphics;
 
 namespace PASS3V4
 {
@@ -62,11 +60,11 @@ namespace PASS3V4
             switch (data.GetToken())
             {
                 case "image":
-                    imageSource = data.GetParameters()["source"];
+                    imageSource = data.GetParamterValue("source");
                     int tempIndex = imageSource.IndexOf("Images");
                     imageSource = imageSource.Substring(tempIndex, imageSource.Length - tempIndex); 
-                    width = int.Parse(data.GetParameters()["width"]);
-                    height = int.Parse(data.GetParameters()["height"]);
+                    width = int.Parse(data.GetParamterValue("width"));
+                    height = int.Parse(data.GetParamterValue("height"));
 
                     for (int i = 0; i < tileCount; i++)
                     {
@@ -83,31 +81,42 @@ namespace PASS3V4
                 case "frame":
                     SetAnimation(data);
                     break;
-
+                case "object":
+                    SetHitBox(data);
+                    break;
             }
         }
 
         private void SetProperties(XMLData data)
         {
-            string name = data.GetParameters()["name"];
+            string name = data.GetParamterValue("name");
 
             switch (name)
             {
                 case "Collision":
-                    tileDict[currentTileId].IsCollision = bool.Parse(data.GetParameters()["value"]);
+                    tileDict[currentTileId].IsCollision = bool.Parse(data.GetParamterValue("value"));
                     break;
                 case "Damage":
-                    tileDict[currentTileId].Damage = int.Parse(data.GetParameters()["value"]);
+                    tileDict[currentTileId].Damage = int.Parse(data.GetParamterValue("value"));
                     break;
             }
         }
 
         private void SetAnimation(XMLData data)
         {
-            tileDict[currentTileId].Frames.Add(int.Parse(data.GetParameters()["tileid"]));
-            tileDict[currentTileId].AnimationDur = (int.Parse(data.GetParameters()["duration"]));
+            tileDict[currentTileId].Frames.Add(int.Parse(data.GetParamterValue("tileid")));
+            tileDict[currentTileId].AnimationDur = int.Parse(data.GetParamterValue("duration"));
             tileDict[currentTileId].IsAnimated = true;
+        }
 
+        private void SetHitBox(XMLData data)
+        {
+            int offsetX = (int)float.Parse(data.GetParamterValue("x"));
+            int offsetY = (int)float.Parse(data.GetParamterValue("y"));
+            int width = (int)(float.Parse(data.GetParamterValue("width")));
+            int height = (int)(float.Parse(data.GetParamterValue("height")));
+
+            tileDict[currentTileId].HitBoxs.Add(new Rectangle(offsetX, offsetY, width, height));
         }
 
         private void ReadHeader(XMLData data)
@@ -115,16 +124,16 @@ namespace PASS3V4
             switch (data.GetToken())
             {
                 case "tileset":
-                    tileWidth = int.Parse(data.GetParameters()["tilewidth"]);
-                    tileHeight = int.Parse(data.GetParameters()["tileheight"]);
-                    tileCount = int.Parse(data.GetParameters()["tilecount"]);
-                    col = int.Parse(data.GetParameters()["columns"]);
+                    tileWidth = int.Parse(data.GetParamterValue("tilewidth"));
+                    tileHeight = int.Parse(data.GetParamterValue("tileheight"));
+                    tileCount = int.Parse(data.GetParamterValue("tilecount"));
+                    col = int.Parse(data.GetParamterValue("columns"));
 
                     tokenStack.Push(data.GetToken());
                     break;
 
                 case "tile":
-                    currentTileId = int.Parse(data.GetParameters()["id"]);
+                    currentTileId = int.Parse(data.GetParamterValue("id"));
 
                     tileDict[currentTileId] = new TileTemplate();
 
@@ -140,6 +149,9 @@ namespace PASS3V4
 
                     if (tileDict[currentTileId] != null) tileDict[currentTileId] = new TileTemplate();
                     tileDict[currentTileId].Frames.Add(currentTileId);
+                    break;
+                case "objectgroup":
+                    tokenStack.Push(data.GetToken());
                     break;
             }
         }

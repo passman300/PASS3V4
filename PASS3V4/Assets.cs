@@ -15,7 +15,7 @@ namespace PASS3V4
         private static string loadPath; // path to load assets from
 
         // fonts
-
+        public static SpriteFont debugFont;
 
         // images
         public static Texture2D pixels;
@@ -31,6 +31,12 @@ namespace PASS3V4
         /// </summary>
         public static void Initialize()
         {
+            // load fonts
+            loadPath = "Fonts";
+
+            debugFont = Load<SpriteFont>("DebugFont");
+
+
             // load all images
             loadPath = "Images/Sprites";
 

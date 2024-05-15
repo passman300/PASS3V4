@@ -60,6 +60,11 @@ namespace PASS3V4
 
         public Dictionary<string, string> GetParameters() => parameters;
 
+        public string GetParamterValue(string key)
+        {
+            return parameters[key];
+        }
+
         public string GetToken() => token;
 
         private void FormatData(string line)

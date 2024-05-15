@@ -1,5 +1,6 @@
 ﻿using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
+using Microsoft.Xna.Framework.Input;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -9,147 +10,65 @@ namespace PASS3V4
 {
     public class TileMap
     {
+        public TileLayer[] BackLayers { get; set; }
 
-        string filePath;
+        public TileLayer[] FrontLayers { get; set; }
 
-        Dictionary<int, TileSetFileIO> tileSets = new Dictionary<int, TileSetFileIO>();
+        public Rectangle[] WallRecs { get; set; }
 
-        Dictionary<int, Tile[]> layer = new Dictionary<int, Tile[]>();
+        private TileMapReader tileMapReader;
 
-        Stack<string> tokenStack = new Stack<string>();
-
-        private int width;
-        private int height;
-
-        private int currenLayer;
-
-        private StreamReader reader;
+        private int splitLayer;
 
         public TileMap(string filePath, GraphicsDevice graphicsDevice)
         {
-            this.filePath = filePath;
+            tileMapReader = new TileMapReader(filePath);
 
-            LoadTileMapFile(graphicsDevice);
+            tileMapReader.LoadTileMapFile(graphicsDevice);
+
+            BackLayers = tileMapReader.GetBackLayers();
+            FrontLayers = tileMapReader.GetFrontLayers();
+            WallRecs = tileMapReader.GetWallRecs();
         }
 
-        private void LoadTileMapFile(GraphicsDevice graphicsDevice)
+        public virtual void Update(GameTime gameTime)
         {
-            reader = new StreamReader(filePath);
-            reader.ReadLine();
-
-            string line;
-            XMLData data;
-
-            while (!reader.EndOfStream)
+            for (int i = 0; i < BackLayers.Length; i++)
             {
-                if (tokenStack.Count() > 0 && (tokenStack.Top() == "data"))
-                {
-                    LoadTiles(graphicsDevice);
-                }
-                else
-                {
-                    line = reader.ReadLine();
-
-                    data = new XMLData(line);
-
-                    if (data.isOneLine) ReadBasicData(data);
-                    else if (data.isHeader) ReadHeader(data);
-                    else if (data.isFooter) ReadFooter(data);
-                }
+                BackLayers[i].Update(gameTime);
             }
-
-            reader.Close();
-        }
-
-        private void ReadBasicData(XMLData data)
-        {
-            switch (data.GetToken())
+            for (int i = 0; i < FrontLayers.Length; i++)
             {
-                case "tileset":
-                    tileSets[int.Parse(data.GetParameters()["firstgid"])] = new TileSetFileIO("Tiled/" + data.GetParameters()["source"]);
-                    break;
+                FrontLayers[i].Update(gameTime);
             }
         }
 
-        private void ReadHeader(XMLData data)
+        public virtual void Update(GameTime gameTime, Player player, KeyboardState kb, KeyboardState prevKb)
         {
-            switch (data.GetToken())
-            {
-                case "layer":
-                    currenLayer = int.Parse(data.GetParameters()["id"]);
-                    width = int.Parse(data.GetParameters()["width"]);
-                    height = int.Parse(data.GetParameters()["height"]);
 
-                    tokenStack.Push(data.GetToken());
-                    break;
-                case "data":
-                    tokenStack.Push(data.GetToken());
-                    break;
+        }
+
+        public void DrawFront(SpriteBatch spriteBatch)
+        {
+            for (int i = 0; i < FrontLayers.Length; i++)
+            {
+                FrontLayers[i].Draw(spriteBatch);
             }
         }
 
-        private void LoadTiles(GraphicsDevice graphicsDevice)
+        public void DrawBack(SpriteBatch spriteBatch)
         {
-            string line = reader.ReadLine();
-
-            Vector3 pos = new Vector3();
-
-            List<Tile> tiles = new List<Tile>();
-
-            while (!reader.EndOfStream && new XMLData(line).notXML)
+            for (int i = 0; i < BackLayers.Length; i++)
             {
-                line = line.TrimEnd(',');
-                int[] tileIDs = line.Split(',').Select(int.Parse).ToArray();
-
-                for (int i = 0; i < tileIDs.Length; i++)
-                {
-                    tileIDs[i] = Math.Max(0, tileIDs[i] - 1);
-
-                    pos.X = i * Tile.WIDTH;
-
-                    int tile = tileIDs[i];
-                    Dictionary<int, TileTemplate> tileData = new Dictionary<int, TileTemplate>();
-                    tileData[tile] = tileSets[1].tileDict[tile];
-
-                    tiles.Add(new Tile(graphicsDevice, Assets.dungeonTileSetImg, tile, pos, tileData[tile]));
-                }
-
-                pos.Y += Tile.HEIGHT;
-                line = reader.ReadLine();
-            }
-
-            layer[currenLayer] = tiles.ToArray();
-
-            tokenStack.Pop();
-        }
-
-        private void ReadFooter(XMLData data)
-        {
-            if (tokenStack.Count() > 0 && (tokenStack.Top() == data.GetToken()))
-            {
-                tokenStack.Pop();
+                BackLayers[i].Draw(spriteBatch);
             }
         }
 
-        public void Update(GameTime gameTime)
+        public void DrawWallHitboxes(SpriteBatch spriteBatch)
         {
-            for (int i = layer.Count; i > 0; i--)
+            for (int i = 0; i < WallRecs.Length; i++)
             {
-                for (int j = 0; j < layer[i].Length; j++)
-                {
-                    layer[i][j].Update(gameTime);
-                }
-            }
-        }
-
-        public void Draw(SpriteBatch spriteBatch)
-        {
-            for (int i = layer.Count; i > 0; i--)
-            {
-                for (int j = 0; j < layer[i].Length; j++)
-                {
-                    layer[i][j].Draw(spriteBatch, true);
-                }
+                spriteBatch.Draw(Assets.pixels, WallRecs[i], Color.Blue * 0.5f);
             }
         }
     }

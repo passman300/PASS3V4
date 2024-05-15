@@ -1,5 +1,15 @@
-﻿using Microsoft.Xna.Framework.Graphics;
+﻿using System;
 using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+using GameUtility;
+
+using Microsoft.Xna.Framework;
+using Microsoft.Xna.Framework.Content;
+using Microsoft.Xna.Framework.Graphics;
+using Microsoft.Xna.Framework.Input;
+
 
 namespace PASS3V4
 {
@@ -8,6 +18,8 @@ namespace PASS3V4
         private int mobSpawns;
 
         private List<int> adjacentRooms = new List<int>();
+
+        private Vector2 spawnPosition;
 
         public Room(string filePath, GraphicsDevice graphicsDevice) : base(filePath, graphicsDevice)
         {
@@ -19,7 +31,20 @@ namespace PASS3V4
              *      
              * create the room stats of mobs, waves, if 
              */
+        }
 
+        public override void Update(GameTime gameTime, Player player, KeyboardState kb, KeyboardState prevKb)
+        {
+            for (int i = 0; i < BackLayers.Length; i++)
+            {
+                BackLayers[i].Update(gameTime);
+            }
+            for (int i = 0; i < FrontLayers.Length; i++)
+            {
+                FrontLayers[i].Update(gameTime);
+            }
+
+            player.Update(gameTime, kb, prevKb, WallRecs);
         }
     }
 }

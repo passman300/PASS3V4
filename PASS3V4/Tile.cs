@@ -1,6 +1,7 @@
 ﻿using GameUtility;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
+using System;
 using System.Collections.Generic;
 
 namespace PASS3V4
@@ -21,7 +22,8 @@ namespace PASS3V4
         private int tileIDperRow;
         private OrderedSet<int> tileID = new OrderedSet<int>();
 
-        private Rectangle hitBox;
+        private Rectangle boundingBox;
+        private List<Rectangle> hitBoxs = new List<Rectangle>();
 
         private Dictionary<Properties, bool> properties = new Dictionary<Properties, bool>();
 
@@ -31,7 +33,9 @@ namespace PASS3V4
 
         private int curFrame;
 
-        private GameRectangle degbugHitBox;
+        private GameRectangle degbugBounding;
+
+        private List<GameRectangle> debugHitBoxs = new List<GameRectangle>();
 
         public Tile(GraphicsDevice graphicsDevice, Texture2D tileSetImg, int tileID, Vector3 position, TileTemplate tileTemplate)
         {
@@ -50,8 +54,15 @@ namespace PASS3V4
             SetTileImages(graphicsDevice, tileSetImg, this.tileID);
 
             // set up the hitbox
-            hitBox = new Rectangle((int)position.X, (int)position.Y, WIDTH, HEIGHT);
-            degbugHitBox = new GameRectangle(graphicsDevice, hitBox);
+            boundingBox = new Rectangle((int)position.X, (int)position.Y, WIDTH, HEIGHT);
+
+            foreach (Rectangle hitBox in tileTemplate.HitBoxs)
+            {
+                hitBoxs.Add(new Rectangle((int)(hitBox.X + position.X), (int)(hitBox.Y + position.Y), hitBox.Width, hitBox.Height));
+                debugHitBoxs.Add(new GameRectangle(graphicsDevice, hitBoxs[hitBoxs.Count - 1]));
+            }
+
+            degbugBounding = new GameRectangle(graphicsDevice, boundingBox);
         }
 
         //public Tile(GraphicsDevice graphicsDevice, Texture2D tileSetImg, OrderedSet<int> tileIDs, Vector3 position, bool isCollidable, int collisionDamage, int animDuration)
@@ -69,8 +80,14 @@ namespace PASS3V4
         //    SetTileImages(graphicsDevice, tileSetImg, tileID);
 
         //    // set up the hitbox
-        //    hitBox = new Rectangle((int)position.X, (int)position.Y, WIDTH, HEIGHT);
+        //    boundingBox = new Rectangle((int)position.X, (int)position.Y, WIDTH, HEIGHT);
         //}
+
+        public Rectangle GetBoundingBox() { return boundingBox; }
+
+        public Rectangle[] GetHitBoxs() { return hitBoxs.ToArray(); }
+
+        public Dictionary<Properties, bool> GetProperties() { return properties; }
 
         private void SetTileImages(GraphicsDevice graphicsDevice, Texture2D tileSetImg, OrderedSet<int> tileID)
         {
@@ -109,14 +126,19 @@ namespace PASS3V4
 
         public void Draw(SpriteBatch spriteBatch, bool debug = false)
         {
-            spriteBatch.Draw(tileImg[curFrame], hitBox, Color.White);
+            spriteBatch.Draw(tileImg[curFrame], boundingBox, Color.White);
 
 
             if (debug)
             {
                 if (properties[Properties.Collision])
                 {
-                    degbugHitBox.Draw(spriteBatch, Color.Red, false);
+                    //degbugBounding.Draw(spriteBatch, Color.Red, false);
+
+                    foreach (GameRectangle hitBox in debugHitBoxs)
+                    {
+                        hitBox.Draw(spriteBatch, Color.Blue, true);
+                    }
                 }
             }
         }

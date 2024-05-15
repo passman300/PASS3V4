@@ -13,8 +13,11 @@ namespace PASS3V4
         private GraphicsDeviceManager graphics;
         private SpriteBatch spriteBatch;
 
-        TileMap room;
+        Room room;
         Player player;
+
+        KeyboardState prevKb;
+        KeyboardState kb;
 
         public Game1()
         {
@@ -41,7 +44,7 @@ namespace PASS3V4
             Assets.Content = Content;
             Assets.Initialize();
 
-            room = new TileMap("Tiled/BasicRoom.tmx", GraphicsDevice);
+            room = new Room("Tiled/BasicRoom.tmx", GraphicsDevice);
 
             player = new Player(Content, GraphicsDevice, "Player/Player.csv");
             // TODO: use this.Content to load your game content here
@@ -52,9 +55,23 @@ namespace PASS3V4
             if (GamePad.GetState(PlayerIndex.One).Buttons.Back == ButtonState.Pressed || Keyboard.GetState().IsKeyDown(Keys.Escape))
                 Exit();
 
+            prevKb = kb;
+            kb = Keyboard.GetState();
+
             // TODO: Add your update logic here
-            player.Update(gameTime, Keyboard.GetState(), Keyboard.GetState());
-            room.Update(gameTime);
+            //player.Update(gameTime, Keyboard.GetState(), Keyboard.GetState());
+
+            //for (int i = 0; i < room.BackLayers.Length; i++)
+            //{
+            //    room.BackLayers[i].Update(gameTime);
+            //}
+
+            //for (int i = 0; i < room.FrontLayers.Length; i++)
+            //{
+            //    room.FrontLayers[i].Update(gameTime);
+            //}
+
+            room.Update(gameTime, player, kb, prevKb);
             base.Update(gameTime);
         }
 
@@ -65,9 +82,14 @@ namespace PASS3V4
             // TODO: Add your drawing code here
 
             spriteBatch.Begin();
-            room.Draw(spriteBatch);
+            room.DrawBack(spriteBatch);
 
-            player.Draw(spriteBatch);
+            player.Draw(spriteBatch, false);
+
+            room.DrawFront(spriteBatch);
+
+            room.DrawWallHitboxes(spriteBatch);
+
             spriteBatch.End();
             base.Draw(gameTime);
         }
