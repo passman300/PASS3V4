@@ -17,7 +17,7 @@ namespace PASS3V4
     {
         private int mobSpawns;
 
-        private List<int> adjacentRooms = new List<int>();
+        private List<int> adjacentRooms = new();
 
         private Vector2 spawnPosition;
 

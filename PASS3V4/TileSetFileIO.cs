@@ -1,8 +1,6 @@
-﻿using System;
+﻿using Microsoft.Xna.Framework;
 using System.Collections.Generic;
 using System.IO;
-using Microsoft.Xna.Framework;
-using Microsoft.Xna.Framework.Graphics;
 
 namespace PASS3V4
 {
@@ -21,14 +19,14 @@ namespace PASS3V4
         private int width;
         private int height;
 
-        public Dictionary<int, TileTemplate> tileDict = new Dictionary<int, TileTemplate>();
+        public Dictionary<int, TileTemplate> tileDict = new();
 
         private Stack<string> tokenStack = new Stack<string>();
         private StreamReader reader;
 
         private int currentTileId;
 
-        private int animationDurSum = 0;
+        private int animationDurSum;
 
         public TileSetFileIO(string filePath)
         {
@@ -44,11 +42,11 @@ namespace PASS3V4
             while (!reader.EndOfStream)
             {
                 string line = reader.ReadLine();
-                
+
                 XMLData data = new XMLData(line);
 
                 if (data.isOneLine) ReadBasicData(data);
-                else if (data.isHeader) ReadHeader(data);   
+                else if (data.isHeader) ReadHeader(data);
                 else if (data.isFooter) ReadFooter(data);
             }
 
@@ -62,14 +60,14 @@ namespace PASS3V4
                 case "image":
                     imageSource = data.GetParamterValue("source");
                     int tempIndex = imageSource.IndexOf("Images");
-                    imageSource = imageSource.Substring(tempIndex, imageSource.Length - tempIndex); 
+                    imageSource = imageSource.Substring(tempIndex, imageSource.Length - tempIndex);
                     width = int.Parse(data.GetParamterValue("width"));
                     height = int.Parse(data.GetParamterValue("height"));
 
                     for (int i = 0; i < tileCount; i++)
                     {
                         tileDict[i] = new TileTemplate();
-                        tileDict[i].Image = Assets.dungeonTileSetImg; 
+                        tileDict[i].Image = Assets.dungeonTileSetImg;
                     }
 
 
@@ -158,10 +156,7 @@ namespace PASS3V4
 
         private void ReadFooter(XMLData data)
         {
-            if (tokenStack.Top() == data.GetToken())
-            {
-                tokenStack.Pop();
-            }
+            if (tokenStack.Top() == data.GetToken()) tokenStack.Pop();
         }
     }
 }

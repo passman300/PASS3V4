@@ -41,8 +41,6 @@ namespace PASS3V4
         protected byte direction;
 
 
-
-
         public Entity(ContentManager content, GraphicsDevice graphicsDevice)
         {
             Content = content;
@@ -51,20 +49,18 @@ namespace PASS3V4
         }
 
 
-        public Vector2 GetPosition() { return position; }
+        public Vector2 GetPosition() => position;
 
-        public void SetPosition(Vector2 position) { this.position = position; }
+        public void SetPosition(Vector2 position) => this.position = position;
 
-        public Rectangle GetHurtBox() { return hurtBox; }
-        public void SetHurtBox(Rectangle hurtBox) { this.hurtBox = hurtBox; }
+        public Rectangle GetHurtBox() => hurtBox;
+        public void SetHurtBox(Rectangle hurtBox) => this.hurtBox = hurtBox;
 
-        public void SetFeetRec(Rectangle feetRec) { this.feetRec = feetRec; }
+        public void SetFeetRec(Rectangle feetRec) => this.feetRec = feetRec;
 
-        public Rectangle GetFeetRec() { return feetRec; }
+        public Rectangle GetFeetRec() => feetRec;
 
-        public virtual void Update(GameTime gameTime)
-        {
-        }
+        public virtual void Update(GameTime gameTime) { }
 
         public virtual void Update(GameTime gameTime, KeyboardState kb, KeyboardState prevKb, Rectangle[] wallRecs = null) { }
 

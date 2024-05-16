@@ -10,11 +10,11 @@ using Microsoft.Xna.Framework;
     {
         string filePath;
 
-        Dictionary<int, TileSetFileIO> tileSets = new Dictionary<int, TileSetFileIO>();
+        Dictionary<int, TileSetFileIO> tileSets = new();
 
-        List<TileLayer> frontLayers = new List<TileLayer>();
-        List<TileLayer> backLayers = new List<TileLayer>();
-        List<Rectangle> wallRecs = new List<Rectangle>();
+        List<TileLayer> frontLayers = new();
+        List<TileLayer> backLayers = new();
+        List<Rectangle> wallRecs = new();
 
         private string curObjectName;
 
@@ -25,14 +25,11 @@ using Microsoft.Xna.Framework;
         private int width;
         private int height;
 
-        Stack<XMLData> tokenStack = new Stack<XMLData>();
+        Stack<XMLData> tokenStack = new();
         
         private StreamReader reader;
 
-        public TileMapReader(string filePath)
-        {
-            this.filePath = filePath;
-        }
+        public TileMapReader(string filePath) => this.filePath = filePath;
 
         public void LoadTileMapFile(GraphicsDevice graphicsDevice)
         {
@@ -78,7 +75,6 @@ using Microsoft.Xna.Framework;
                             break;
                     }
                     break;
-
                 case "tileset":
                     tileSets[int.Parse(data.GetParamterValue("firstgid"))] = new TileSetFileIO("Tiled/" + data.GetParamterValue("source"));
                     break;
@@ -126,9 +122,9 @@ using Microsoft.Xna.Framework;
         private void LoadTiles(GraphicsDevice graphicsDevice)
         {
             string line = reader.ReadLine();
-            Vector3 pos = new Vector3();
+            Vector3 pos = new();
 
-            List<Tile> tiles = new List<Tile>();
+            List<Tile> tiles = new();
 
             while (!reader.EndOfStream && new XMLData(line).notXML)
             {
@@ -142,8 +138,7 @@ using Microsoft.Xna.Framework;
                     pos.X = i * Tile.WIDTH;
 
                     int tile = tileIDs[i];
-                    Dictionary<int, TileTemplate> tileData = new Dictionary<int, TileTemplate>();
-                    tileData[tile] = tileSets[1].tileDict[tile];
+                    Dictionary<int, TileTemplate> tileData = new() { [tile] = tileSets[1].tileDict[tile] };
 
                     tiles.Add(new Tile(graphicsDevice, Assets.dungeonTileSetImg, tile, pos, tileData[tile]));
                 }
@@ -152,7 +147,7 @@ using Microsoft.Xna.Framework;
                 line = reader.ReadLine();
             }
 
-            if (frontLayers.Count > 0 && (frontLayers[^1].Tiles == null)) frontLayers[frontLayers.Count - 1].LoadTiles(tiles.ToArray());
+            if (frontLayers.Count > 0 && (frontLayers[^1].Tiles == null)) frontLayers[^1].LoadTiles(tiles.ToArray());
             else backLayers[^1].LoadTiles(tiles.ToArray());
 
             tokenStack.Pop();
@@ -168,19 +163,10 @@ using Microsoft.Xna.Framework;
             }
         }
 
-        public TileLayer[] GetFrontLayers()
-        {
-            return frontLayers.ToArray<TileLayer>();
-        }
+        public TileLayer[] GetFrontLayers() => frontLayers.ToArray<TileLayer>();
 
-        public TileLayer[] GetBackLayers()
-        {
-            return backLayers.ToArray<TileLayer>();
-        }
+        public TileLayer[] GetBackLayers() => backLayers.ToArray<TileLayer>();
 
-        public Rectangle[] GetWallRecs()
-        {
-            return wallRecs.ToArray<Rectangle>();
-        }
+        public Rectangle[] GetWallRecs() => wallRecs.ToArray<Rectangle>();
     }
 }
