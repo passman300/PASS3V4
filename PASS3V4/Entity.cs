@@ -28,9 +28,6 @@ namespace PASS3V4
         protected Rectangle hurtBox;
         protected Rectangle feetRec;
 
-        protected GameRectangle debugHurtBox;
-        protected GameRectangle debugAnimBox;
-        protected GameRectangle debugFeetBox;
         protected Vector2 position;
         protected Vector2 hurtPosition;
         protected Vector2 feetPosition;
@@ -40,6 +37,9 @@ namespace PASS3V4
 
         protected byte direction;
 
+        protected GameRectangle debugFeetRec;
+        protected GameRectangle debugHurtBox;
+        protected GameRectangle debugAnimBox;
 
         public Entity(ContentManager content, GraphicsDevice graphicsDevice)
         {
@@ -52,6 +52,9 @@ namespace PASS3V4
         public Vector2 GetPosition() => position;
 
         public void SetPosition(Vector2 position) => this.position = position;
+
+        public Vector2 GetCenterPosition() => centerPosition;
+        public void SetCenterPosition(Vector2 centerPosition) => this.centerPosition = centerPosition;
 
         public Rectangle GetHurtBox() => hurtBox;
         public void SetHurtBox(Rectangle hurtBox) => this.hurtBox = hurtBox;
@@ -68,9 +71,9 @@ namespace PASS3V4
         {
             if (debug)
             {
-                debugHurtBox.Draw(spriteBatch, Color.Blue * 0.5f, true);
+                spriteBatch.Draw(Assets.pixels, hurtBox, Color.Blue * 0.5f);
 
-                debugAnimBox.Draw(spriteBatch, Color.Red * 0.5f, true);
+                spriteBatch.Draw(Assets.pixels, hurtBox, Color.Blue * 0.5f);
             }
         }
 

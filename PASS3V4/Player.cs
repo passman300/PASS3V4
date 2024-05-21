@@ -14,12 +14,14 @@ namespace PASS3V4
         {
             Idle,
             Walk,
+            Run,
             Attack,
             Hurt,
             Die
         }
 
-        const float SPEED_BASE = 3;
+        const float SPEED_BASE = 4f;
+        const float SPRINT_SCALE = 1.25f;
 
         const int HURT_BOX_WIDTH = 32;
         const int HURT_BOX_HEIGHT = 56;
@@ -55,13 +57,11 @@ namespace PASS3V4
 
             feetRec = new Rectangle(hurtBox.X + FEET_OFFSET_X, hurtBox.Y + FEET_OFFSET_Y, FEET_WIDTH, FEET_HEIGHT);
 
-            debugHurtBox = new GameRectangle(graphicsDevice, hurtBox.X, hurtBox.Y, hurtBox.Width, hurtBox.Height);
-
-            debugFeetBox = new GameRectangle(graphicsDevice, feetRec.X, feetRec.Y, feetRec.Width, feetRec.Height);
-
-            debugAnimBox = new GameRectangle(graphicsDevice, anim[0].GetDestRec().X, anim[0].GetDestRec().Y, anim[0].GetDestRec().Width, anim[0].GetDestRec().Height);
-
             speed = SPEED_BASE;
+
+            debugFeetRec = new GameRectangle(graphicsDevice, feetRec);
+            debugHurtBox = new GameRectangle(graphicsDevice, hurtBox);
+            debugAnimBox = new GameRectangle(graphicsDevice, anim[(int)state].GetDestRec());
         }
 
 
@@ -75,6 +75,9 @@ namespace PASS3V4
                     UpdateIdle(gameTime, kb);
                     break;
                 case State.Walk:
+                    UpdateWalk(gameTime, kb, wallRecs);
+                    break;
+                case State.Run:
                     UpdateWalk(gameTime, kb, wallRecs);
                     break;
             }
@@ -95,6 +98,8 @@ namespace PASS3V4
                 byte left = (byte)(kb.IsKeyDown(Keys.A) ? 1 : 0);
                 byte right = (byte)(kb.IsKeyDown(Keys.D) ? 1 : 0);
 
+                byte isSprinting = (byte)(kb.IsKeyDown(Keys.LeftShift) ? 1 : 0);
+
                 if (left == 1 && right == 0) direction = LEFT;
                 else if (right == 1 && left == 0) direction = RIGHT;
 
@@ -104,7 +109,12 @@ namespace PASS3V4
                 if (velocity.LengthSquared() > 0)
                 {
                     velocity = Vector2.Normalize(velocity) * speed;
+
+                    if (isSprinting == 1) state = State.Run;
+                    else state = State.Walk;
                 }
+
+                if (isSprinting == 1) velocity *= SPRINT_SCALE;
 
                 Move(wallRecs, velocity.X, velocity.Y);
 
@@ -126,9 +136,8 @@ namespace PASS3V4
                 return;
             }
 
-            Vector2 newVelocity = CheckWallCollision(wallRecs, x, y).Velocity;
-
-            position += newVelocity;
+            position += CheckWallCollision(wallRecs, x, y).Velocity; 
+            
         }
 
         /// <summary>
@@ -157,11 +166,11 @@ namespace PASS3V4
                 feetRec.Y = hurtBox.Y + FEET_OFFSET_Y;
             }
 
-            centerPosition = hurtBox.Center.ToVector2();
+            debugFeetRec.TranslateTo(feetRec.X, feetRec.Y);
+            debugHurtBox.TranslateTo(hurtBox.X, hurtBox.Y);
+            debugAnimBox.TranslateTo(anim[(int)state].GetDestRec().X, anim[(int)state].GetDestRec().Y);
 
-            debugHurtBox = new GameRectangle(graphicsDevice, hurtBox.X, hurtBox.Y, hurtBox.Width, hurtBox.Height);
-            debugFeetBox = new GameRectangle(graphicsDevice, feetRec.X, feetRec.Y, feetRec.Width, feetRec.Height);
-            debugAnimBox = new GameRectangle(graphicsDevice, anim[(int)state].GetDestRec().X, anim[(int)state].GetDestRec().Y, anim[(int)state].GetDestRec().Width, anim[(int)state].GetDestRec().Height);
+            centerPosition = hurtBox.Center.ToVector2();
         }
 
         private void UpdateIdle(GameTime gameTime, KeyboardState kb)
@@ -185,52 +194,14 @@ namespace PASS3V4
             }
         }
 
-        //public bool UpdateCollision(Tile[] tiles)
-        //{
-        //    bool isCollided = false;
-
-        //    foreach (Tile tile in tiles)
-        //    {
-        //        if (tile.GetProperties()[Tile.Properties.Collision] && (feetRec.Intersects(tile.GetBoundingBox())))
-        //        {
-        //            foreach (Rectangle tileHitBox in tile.GetHitBoxs())
-        //            {
-        //                if (!feetRec.Intersects(tileHitBox)) continue;
-
-        //                // Collision from the left
-        //                if (velocity.X > 0 && feetRec.Right >= tileHitBox.Left && (feetRec.Bottom > tileHitBox.Top || feetRec.Top < tileHitBox.Bottom))
-        //                {
-        //                    position.X = tileHitBox.Left - FEET_WIDTH - FEET_OFFSET_X - HURT_BOX_OFFSET_X;
-        //                }
-        //                // Collision from the right
-        //                else if (velocity.X < 0 && feetRec.Left <= tileHitBox.Right && (feetRec.Bottom > tileHitBox.Top || feetRec.Top < tileHitBox.Bottom))
-        //                {
-        //                    position.X = tileHitBox.Right - (anim[(int)state].GetDestRec().Width - FEET_WIDTH - FEET_OFFSET_X - HURT_BOX_OFFSET_X);
-        //                }
-
-        //                // Collision from the top
-        //                if (velocity.Y > 0 && feetRec.Bottom >= tileHitBox.Top && (feetRec.Right > tileHitBox.Left || feetRec.Left < tileHitBox.Right))
-        //                {
-        //                    position.Y = tileHitBox.Top - FEET_HEIGHT - FEET_OFFSET_Y - HURT_BOX_OFFSET_Y;
-        //                }
-        //                // Collision from the bottom
-        //                else if (velocity.Y < 0 && feetRec.Top <= tileHitBox.Bottom && (feetRec.Right > tileHitBox.Left || feetRec.Left < tileHitBox.Right))
-        //                {
-        //                    position.Y = tileHitBox.Bottom - FEET_OFFSET_Y - HURT_BOX_OFFSET_Y;
-        //                }
-
-        //                isCollided = true;
-        //            }
-        //        }s
-        //    }
-        //    return isCollided;
-        //}
-
-        public (bool IsCollided, Vector2 Velocity) CheckWallCollision(Rectangle[] wallRecs, float newX, float newY)
+        public (bool IsCollided, Vector2 Velocity) CheckWallCollision(Rectangle[] wallRecs, float x, float y)
         {
+            float newX = x;
+            float newY = y;
+
             bool isCollided = false;
 
-            Rectangle newFeetRec = new((int)(feetRec.X + newX), (int)(feetRec.Y + newY), feetRec.Width, feetRec.Height);
+            Rectangle newFeetRec = new((int)(feetRec.X + x), (int)(feetRec.Y + y), feetRec.Width, feetRec.Height);
 
             foreach (Rectangle rec in wallRecs)
             {
@@ -238,21 +209,21 @@ namespace PASS3V4
                 {
                     isCollided = true;
 
-                    if (newX > 0 && newFeetRec.Right >= rec.Left && (newFeetRec.Bottom > rec.Top || newFeetRec.Top < rec.Bottom)) // Collision from the left
+                    if (x > 0 && (feetRec.X + x) + feetRec.Width > rec.Left) // Collision from the left
                         newX = rec.Left - feetRec.Right;
-                    else if (newX < 0 && newFeetRec.Left <= rec.Right && (newFeetRec.Bottom > rec.Top || newFeetRec.Top < rec.Bottom)) // Collision from the right
-                        newX = feetRec.Left - rec.Right;
-                    else if (newY > 0 && newFeetRec.Bottom >= rec.Top && (newFeetRec.Right > rec.Left || newFeetRec.Left < rec.Right)) // Collision from the top
+                    else if (x < 0 && (feetRec.X + x) < rec.Right) // Collision from the right
+                        newX = rec.Right - feetRec.Left;
+                    else if (y > 0 && feetRec.Y + y + feetRec.Height > rec.Top) // Collision from the top
                         newY = rec.Top - feetRec.Bottom;
-                    else if (newY < 0 && newFeetRec.Top <= rec.Bottom && (newFeetRec.Right > rec.Left || newFeetRec.Left < rec.Right)) // Collision from the bottom
-                        newY = feetRec.Top - rec.Bottom;
+                    else if (y < 0 && feetRec.Y + y < rec.Bottom) // Collision from the bottom
+                        newY = rec.Bottom - feetRec.Top;
                 }
             }
 
-            if (Math.Abs(newX) > speed)
+            if (Math.Abs(newX) > speed * (State.Run == state ? SPRINT_SCALE : 1))
                 newX = 0;
 
-            if (Math.Abs(newY) > speed)
+            if (Math.Abs(newY) > speed * (State.Run == state ? SPRINT_SCALE : 1))
                 newY = 0;
 
             return (isCollided, new Vector2(newX, newY));
@@ -272,14 +243,16 @@ namespace PASS3V4
             if (true)
             {
                 spriteBatch.DrawString(Assets.debugFont, string.Format(" position: X: {0}, Y: {1}", position.X, position.Y), new Vector2(10, 10), Color.White);
+                spriteBatch.DrawString(Assets.debugFont, direction.ToString(), new Vector2(10, 30), Color.White);
+                spriteBatch.DrawString(Assets.debugFont, velocity.ToString(), new Vector2(10, 50), Color.White);
+
+                debugFeetRec.Draw(spriteBatch, Color.Red, false);
+                debugHurtBox.Draw(spriteBatch, Color.Green, false);
+                debugAnimBox.Draw(spriteBatch, Color.Purple, false);
+
 
                 if (false)
                 {
-                    debugHurtBox.Draw(spriteBatch, Color.Blue * 0.5f, false);
-                    debugFeetBox.Draw(spriteBatch, Color.Green, false);
-                    debugAnimBox.Draw(spriteBatch, Color.Black * 0.5f, false);
-
-
                     foreach (Vector2 v in breadCrumbs)
                     {
                         spriteBatch.Draw(Assets.pixels, new Rectangle((int)v.X, (int)v.Y, 3, 3), Color.Red);

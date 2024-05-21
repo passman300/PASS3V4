@@ -34,6 +34,7 @@
   </ItemGroup>
   <ItemGroup>
     <Folder Include="bin\Debug\net6.0\AnimationSheets\" />
+    <Folder Include="Content\Images\Sprites\Weapons\" />
     <Folder Include="Libaries\" />
   </ItemGroup>
   <ItemGroup>

@@ -65,27 +65,9 @@ namespace PASS3V4
             degbugBounding = new GameRectangle(graphicsDevice, boundingBox);
         }
 
-        //public Tile(GraphicsDevice graphicsDevice, Texture2D tileSetImg, OrderedSet<int> tileIDs, Vector3 position, bool isCollidable, int collisionDamage, int animDuration)
-        //{
-        //    this.tileID = tileIDs;
-
-        //    properties[Properties.Collision] = isCollidable;
-        //    this.collisionDamage = collisionDamage;
-
-        //    properties[Properties.Animated] = true;
-        //    frameDuration = new Timer(animDuration, true);
-        //    curFrame = 0;
-
-        //    // set up the tile image
-        //    SetTileImages(graphicsDevice, tileSetImg, tileID);
-
-        //    // set up the hitbox
-        //    boundingBox = new Rectangle((int)position.X, (int)position.Y, WIDTH, HEIGHT);
-        //}
-
         public Rectangle GetBoundingBox() { return boundingBox; }
 
-        public Rectangle[] GetHitBoxs() { return hitBoxs.ToArray(); }
+        public Rectangle[] GetHitBoxes() { return hitBoxs.ToArray(); }
 
         public Dictionary<Properties, bool> GetProperties() { return properties; }
 

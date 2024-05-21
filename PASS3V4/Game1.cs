@@ -16,14 +16,16 @@ namespace PASS3V4
         Room room;
         Player player;
 
+        Weapon weapon;
+
         KeyboardState prevKb;
         KeyboardState kb;
 
         //Step 1: Decide the target Update framerate desired
-        int updateFPS = 80;
+        int updateFPS = 70;
 
         //Step 2: Decide the target Draw framerate desired
-        int drawFPS = 80;
+        int drawFPS = 70;
 
         //Step 3: Calculate how many updates need to execute before a Draw occurs
         int updateTarget;
@@ -65,6 +67,8 @@ namespace PASS3V4
             room = new Room("Tiled/BasicRoom.tmx", GraphicsDevice);
 
             player = new Player(Content, GraphicsDevice, "Player/Player.csv");
+
+            weapon = new Weapon(GraphicsDevice, Assets.weaponSetImg, new Rectangle(64, 128, 32, 64), player.GetCenterPosition() + new Vector2(0, -64), new Vector2(16, 64), 0.1f);
             // TODO: use this.Content to load your game content here
         }
 
@@ -90,6 +94,7 @@ namespace PASS3V4
             //}
 
             room.Update(gameTime, player, kb, prevKb);
+            weapon.Update(gameTime, player.GetCenterPosition());
 
 
             //Step 7: Update the number of updates passed since the last Draw
@@ -125,6 +130,8 @@ namespace PASS3V4
                 room.DrawFront(spriteBatch);
 
                 room.DrawWallHitboxes(spriteBatch);
+
+                weapon.Draw(spriteBatch);
 
                 spriteBatch.End();
                 base.Draw(gameTime);

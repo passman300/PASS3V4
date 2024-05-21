@@ -68,7 +68,7 @@ namespace PASS3V4
         {
             for (int i = 0; i < WallRecs.Length; i++)
             {
-                spriteBatch.Draw(Assets.pixels, WallRecs[i], Color.Blue * 0.5f);
+                spriteBatch.Draw(Assets.pixels, WallRecs[i], Color.Blue * 0.2f);
             }
         }
     }
