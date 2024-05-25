@@ -67,6 +67,8 @@ namespace PASS3V4
 
         public virtual void Update(GameTime gameTime, KeyboardState kb, KeyboardState prevKb, Rectangle[] wallRecs = null) { }
 
+        public virtual void Update(GameTime gameTime, KeyboardState kb, KeyboardState prevKb, MouseState mouse, MouseState prevMouse, Rectangle[] wallRecs = null) { }
+
         public virtual void Draw(SpriteBatch spriteBatch, bool debug = false)
         {
             if (debug)

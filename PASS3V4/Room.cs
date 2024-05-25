@@ -33,7 +33,7 @@ namespace PASS3V4
              */
         }
 
-        public override void Update(GameTime gameTime, Player player, KeyboardState kb, KeyboardState prevKb)
+        public override void Update(GameTime gameTime, Player player, KeyboardState kb, KeyboardState prevKb, MouseState mouse, MouseState prevMouse)
         {
             for (int i = 0; i < BackLayers.Length; i++)
             {
@@ -44,7 +44,7 @@ namespace PASS3V4
                 FrontLayers[i].Update(gameTime);
             }
 
-            player.Update(gameTime, kb, prevKb, WallRecs);
+            player.Update(gameTime, kb, prevKb, mouse, prevMouse, WallRecs);
         }
     }
 }

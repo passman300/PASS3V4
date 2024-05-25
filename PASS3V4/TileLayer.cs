@@ -13,12 +13,14 @@ namespace PASS3V4
 
         public bool IsFront { get; set; }
 
-        public Tile[] Tiles { get; set; }
+        public Tile[] Tiles { get; private set; }
 
-        public TileLayer(string name, int layerOrder)
+        public TileLayer(string name, int layerOrder, int width, int height)
         {
             Name = name;
             LayerOrder = layerOrder;
+
+            Tiles = new Tile[width * height];
 
             IsFront = false;
         }
@@ -31,10 +33,9 @@ namespace PASS3V4
             IsFront = isFront;
         }
 
-
-        public void LoadTiles(Tile[] tiles)
+        public void LoadTile(Tile tile, int index)
         {
-            Tiles = tiles;
+            Tiles[index] = tile;
         }
 
         public void Update(GameTime gameTime)

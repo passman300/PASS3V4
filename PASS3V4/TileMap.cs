@@ -43,10 +43,8 @@ namespace PASS3V4
             }
         }
 
-        public virtual void Update(GameTime gameTime, Player player, KeyboardState kb, KeyboardState prevKb)
-        {
-
-        }
+        public virtual void Update(GameTime gameTime, Player player, KeyboardState kb, KeyboardState prevKb) {   }
+        public virtual void Update(GameTime gameTime, Player player, KeyboardState kb, KeyboardState prevKb, MouseState mouse, MouseState prevMouse) { }
 
         public void DrawFront(SpriteBatch spriteBatch)
         {

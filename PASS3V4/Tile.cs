@@ -87,10 +87,7 @@ namespace PASS3V4
                 sourceRec.X = col * WIDTH;
                 sourceRec.Y = row * HEIGHT;
 
-                tileImg.Add(new Texture2D(graphicsDevice, WIDTH, HEIGHT));
-                Color[] data = new Color[WIDTH * HEIGHT];
-                tileSetImg.GetData(0, sourceRec, data, 0, data.Length);
-                tileImg[tileImg.Count - 1].SetData(data);
+                tileImg.Add(Util.Crop(tileSetImg, sourceRec));
             }
         }
 

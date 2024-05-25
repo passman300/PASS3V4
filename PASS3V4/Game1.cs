@@ -7,8 +7,8 @@ namespace PASS3V4
 {
     public class Game1 : Game
     {
-        private const int SCREEN_WIDTH = 960;
-        private const int SCREEN_HEIGHT = 800;
+        public const int SCREEN_WIDTH = 960;
+        public const int SCREEN_HEIGHT = 800;
 
         private GraphicsDeviceManager graphics;
         private SpriteBatch spriteBatch;
@@ -18,8 +18,12 @@ namespace PASS3V4
 
         Weapon weapon;
 
+        Rectangle tempRec = new Rectangle(480, 400, 90, 50);
+
         KeyboardState prevKb;
         KeyboardState kb;
+        MouseState mouse;
+        MouseState prevMouse;
 
         //Step 1: Decide the target Update framerate desired
         int updateFPS = 70;
@@ -68,8 +72,6 @@ namespace PASS3V4
 
             player = new Player(Content, GraphicsDevice, "Player/Player.csv");
 
-            weapon = new Weapon(GraphicsDevice, Assets.weaponSetImg, new Rectangle(64, 128, 32, 64), player.GetCenterPosition() + new Vector2(0, -64), new Vector2(16, 64), 0.1f);
-            // TODO: use this.Content to load your game content here
         }
 
         protected override void Update(GameTime gameTime)
@@ -79,6 +81,9 @@ namespace PASS3V4
 
             prevKb = kb;
             kb = Keyboard.GetState();
+
+            prevMouse = mouse;
+            mouse = Mouse.GetState();
 
             // TODO: Add your update logic here
             //player.Update(gameTime, Keyboard.GetState(), Keyboard.GetState());
@@ -93,8 +98,7 @@ namespace PASS3V4
             //    room.FrontLayers[i].Update(gameTime);
             //}
 
-            room.Update(gameTime, player, kb, prevKb);
-            weapon.Update(gameTime, player.GetCenterPosition());
+            room.Update(gameTime, player, kb, prevKb, mouse, prevMouse);
 
 
             //Step 7: Update the number of updates passed since the last Draw
@@ -131,9 +135,8 @@ namespace PASS3V4
 
                 room.DrawWallHitboxes(spriteBatch);
 
-                weapon.Draw(spriteBatch);
-
                 spriteBatch.End();
+
                 base.Draw(gameTime);
             }
            

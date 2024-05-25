@@ -36,6 +36,8 @@ namespace PASS3V4
         const int BREAD_CRUMB_DIST = 10;
         const int MAX_BREAD_CRUMBS = 10;
 
+        const int NUM_WEAPONS = 2;
+
         private State state = State.Idle;
 
         private float health;
@@ -44,7 +46,8 @@ namespace PASS3V4
 
         private List<Vector2> breadCrumbs = new();
 
-
+        private Weapon[] weapons = new Weapon[NUM_WEAPONS];
+        private int activeWeapon = 0;
 
         public Player(ContentManager content, GraphicsDevice graphicsDevice, string csvFilePath) : base(content, graphicsDevice)
         {
@@ -62,10 +65,18 @@ namespace PASS3V4
             debugFeetRec = new GameRectangle(graphicsDevice, feetRec);
             debugHurtBox = new GameRectangle(graphicsDevice, hurtBox);
             debugAnimBox = new GameRectangle(graphicsDevice, anim[(int)state].GetDestRec());
+
+            SetupWeapon(0, new LargeSword(graphicsDevice, centerPosition));
+            SetupWeapon(1, new Bow(graphicsDevice, centerPosition));
+        }
+
+        private void SetupWeapon(int index, Weapon weapon)
+        {
+            weapons[index] = weapon;
         }
 
 
-        public override void Update(GameTime gameTime, KeyboardState kb, KeyboardState prevKb, Rectangle[] wallRecs = null)
+        public override void Update(GameTime gameTime, KeyboardState kb, KeyboardState prevKb, MouseState mouse, MouseState prevMouse, Rectangle[] wallRecs = null)
         {
             anim[(int)state].Update(gameTime);
 
@@ -86,6 +97,10 @@ namespace PASS3V4
 
             // update bread crumbs
             UpdateBreadCrumbs();
+
+            if (kb.IsKeyDown(Keys.E) && prevKb.IsKeyUp(Keys.E)) activeWeapon = (activeWeapon + 1) % 2;
+
+            weapons[activeWeapon].Update(graphicsDevice, gameTime, centerPosition, mouse, prevMouse);
         }
 
         private void UpdateWalk(GameTime gameTime, KeyboardState kb, Rectangle[] wallRecs)
@@ -93,28 +108,33 @@ namespace PASS3V4
             if ((kb.IsKeyDown(Keys.W) ^ kb.IsKeyDown(Keys.S)) || (kb.IsKeyDown(Keys.A) ^ kb.IsKeyDown(Keys.D)))
             {
                 // movement: up, down, left, right
-                byte up = (byte)(kb.IsKeyDown(Keys.W) ? 1 : 0);
-                byte down = (byte)(kb.IsKeyDown(Keys.S) ? 1 : 0);
-                byte left = (byte)(kb.IsKeyDown(Keys.A) ? 1 : 0);
-                byte right = (byte)(kb.IsKeyDown(Keys.D) ? 1 : 0);
+                bool up = kb.IsKeyDown(Keys.W);
+                bool down = kb.IsKeyDown(Keys.S);
+                bool left = kb.IsKeyDown(Keys.A);
+                bool right = kb.IsKeyDown(Keys.D);
 
-                byte isSprinting = (byte)(kb.IsKeyDown(Keys.LeftShift) ? 1 : 0);
+                bool isSprinting = kb.IsKeyDown(Keys.LeftShift);
 
-                if (left == 1 && right == 0) direction = LEFT;
-                else if (right == 1 && left == 0) direction = RIGHT;
+                if (left && !right) direction = LEFT;
+                else if (right && !left) direction = RIGHT;
 
-                velocity.X = right - left;
-                velocity.Y = down - up;
+
+                if ((right && left) || (!right && !left)) velocity.X = 0;
+                else if (right && !left) velocity.X = 1;
+                else if (left && !right) velocity.X = -1;
+                if ((up && down) || (!up && !down)) velocity.Y = 0;
+                else if (up && !down) velocity.Y = -1;
+                else if (down && !up) velocity.Y = 1;
 
                 if (velocity.LengthSquared() > 0)
                 {
                     velocity = Vector2.Normalize(velocity) * speed;
 
-                    if (isSprinting == 1) state = State.Run;
+                    if (isSprinting) state = State.Run;
                     else state = State.Walk;
                 }
 
-                if (isSprinting == 1) velocity *= SPRINT_SCALE;
+                if (isSprinting) velocity *= SPRINT_SCALE;
 
                 Move(wallRecs, velocity.X, velocity.Y);
 
@@ -137,7 +157,6 @@ namespace PASS3V4
             }
 
             position += CheckWallCollision(wallRecs, x, y).Velocity; 
-            
         }
 
         /// <summary>
@@ -194,7 +213,7 @@ namespace PASS3V4
             }
         }
 
-        public (bool IsCollided, Vector2 Velocity) CheckWallCollision(Rectangle[] wallRecs, float x, float y)
+        private (bool IsCollided, Vector2 Velocity) CheckWallCollision(Rectangle[] wallRecs, float x, float y)
         {
             float newX = x;
             float newY = y;
@@ -240,11 +259,14 @@ namespace PASS3V4
                 anim[(int)state].Draw(spriteBatch, Color.White);
             }
 
+            weapons[activeWeapon].Draw(spriteBatch);
+
             if (true)
             {
                 spriteBatch.DrawString(Assets.debugFont, string.Format(" position: X: {0}, Y: {1}", position.X, position.Y), new Vector2(10, 10), Color.White);
                 spriteBatch.DrawString(Assets.debugFont, direction.ToString(), new Vector2(10, 30), Color.White);
                 spriteBatch.DrawString(Assets.debugFont, velocity.ToString(), new Vector2(10, 50), Color.White);
+                spriteBatch.DrawString(Assets.debugFont, weapons[activeWeapon].GetAngle().ToString(), new Vector2(10, 70), Color.White);
 
                 debugFeetRec.Draw(spriteBatch, Color.Red, false);
                 debugHurtBox.Draw(spriteBatch, Color.Green, false);

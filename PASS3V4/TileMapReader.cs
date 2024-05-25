@@ -84,6 +84,7 @@ using Microsoft.Xna.Framework;
                     if (backLayers[^1].IsFront)
                     {
                         frontLayers.Add(backLayers[^1]);
+                        frontLayers[^1].IsFront = true;
                         backLayers.RemoveAt(backLayers.Count - 1);
                     }
                     break;
@@ -106,7 +107,7 @@ using Microsoft.Xna.Framework;
                     width = int.Parse(data.GetParamterValue("width"));
                     height = int.Parse(data.GetParamterValue("height"));
 
-                    backLayers.Add(new TileLayer(curLayerName, curLayerOrder));
+                    backLayers.Add(new TileLayer(curLayerName, curLayerOrder, width, height));
 
                     tokenStack.Push(data);
                     break;
@@ -124,7 +125,9 @@ using Microsoft.Xna.Framework;
             string line = reader.ReadLine();
             Vector3 pos = new();
 
-            List<Tile> tiles = new();
+            //List<Tile> tiles = new();
+
+            int count = 0;
 
             while (!reader.EndOfStream && new XMLData(line).notXML)
             {
@@ -140,15 +143,20 @@ using Microsoft.Xna.Framework;
                     int tile = tileIDs[i];
                     Dictionary<int, TileTemplate> tileData = new() { [tile] = tileSets[1].tileDict[tile] };
 
-                    tiles.Add(new Tile(graphicsDevice, Assets.dungeonTileSetImg, tile, pos, tileData[tile]));
+
+                    if (frontLayers.Count > 0 && (frontLayers[^1].Tiles[^1] == null)) frontLayers[^1].LoadTile(new Tile(graphicsDevice, Assets.dungeonTileSetImg, tile, pos, tileData[tile]), count);
+                    else backLayers[^1].LoadTile(new Tile(graphicsDevice, Assets.dungeonTileSetImg, tile, pos, tileData[tile]), count);
+
+                    count++;
+                    //tiles.Add(new Tile(graphicsDevice, Assets.dungeonTileSetImg, tile, pos, tileData[tile]));
                 }
 
                 pos.Y += Tile.HEIGHT;
                 line = reader.ReadLine();
             }
 
-            if (frontLayers.Count > 0 && (frontLayers[^1].Tiles == null)) frontLayers[^1].LoadTiles(tiles.ToArray());
-            else backLayers[^1].LoadTiles(tiles.ToArray());
+            //if (frontLayers.Count > 0 && (frontLayers[^1].Tiles == null)) frontLayers[^1].LoadTiles(tiles.ToArray());
+            //else backLayers[^1].LoadTiles(tiles.ToArray());
 
             tokenStack.Pop();
         }
