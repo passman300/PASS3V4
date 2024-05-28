@@ -37,6 +37,8 @@ namespace PASS3V4
 
         private List<GameRectangle> debugHitBoxs = new List<GameRectangle>();
 
+        public static bool isDebug = false;
+
         public Tile(GraphicsDevice graphicsDevice, Texture2D tileSetImg, int tileID, Vector3 position, TileTemplate tileTemplate)
         {
             if (tileTemplate.Frames.Count > 0)
@@ -44,7 +46,7 @@ namespace PASS3V4
             this.tileID.Add(tileID);
 
             properties[Properties.Collision] = tileTemplate.IsCollision;
-            this.collisionDamage = tileTemplate.Damage;
+            collisionDamage = tileTemplate.Damage;
 
             properties[Properties.Animated] = tileTemplate.IsAnimated;
             frameDuration = new Timer(tileTemplate.AnimationDur, true);
@@ -59,10 +61,10 @@ namespace PASS3V4
             foreach (Rectangle hitBox in tileTemplate.HitBoxs)
             {
                 hitBoxs.Add(new Rectangle((int)(hitBox.X + position.X), (int)(hitBox.Y + position.Y), hitBox.Width, hitBox.Height));
-                debugHitBoxs.Add(new GameRectangle(graphicsDevice, hitBoxs[hitBoxs.Count - 1]));
+                if (isDebug) debugHitBoxs.Add(new GameRectangle(graphicsDevice, hitBoxs[hitBoxs.Count - 1]));
             }
 
-            degbugBounding = new GameRectangle(graphicsDevice, boundingBox);
+            if (isDebug) degbugBounding = new GameRectangle(graphicsDevice, boundingBox);
         }
 
         public Rectangle GetBoundingBox() { return boundingBox; }
@@ -103,17 +105,15 @@ namespace PASS3V4
             }
         }
 
-        public void Draw(SpriteBatch spriteBatch, bool debug = false)
+        public void Draw(SpriteBatch spriteBatch)
         {
             spriteBatch.Draw(tileImg[curFrame], boundingBox, Color.White);
 
 
-            if (debug)
+            if (isDebug)
             {
                 if (properties[Properties.Collision])
                 {
-                    //degbugBounding.Draw(spriteBatch, Color.Red, false);
-
                     foreach (GameRectangle hitBox in debugHitBoxs)
                     {
                         hitBox.Draw(spriteBatch, Color.Blue, true);

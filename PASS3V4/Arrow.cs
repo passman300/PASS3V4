@@ -27,6 +27,8 @@ namespace PASS3V4
         public const int IMAGE_SOURCE_WIDTH = 48;
         public const int IMAGE_SOURCE_HEIGHT = 32;
 
+        private const int BASE_SPEED = 10;
+
         private static Texture2D img = Util.Crop(Assets.weaponSetImg, new Rectangle(IMAGE_SOURCE_X, IMAGE_SOURCE_Y, IMAGE_SOURCE_WIDTH, IMAGE_SOURCE_HEIGHT));
         private Rectangle sourceRec;
 
@@ -43,12 +45,13 @@ namespace PASS3V4
         private float hitBoxWidth;
         private float hitBoxHeight;
 
+        public static bool isDebug = false;
         private GameRectangle degbugHitBox;
 
         public ArrowState State { get; set; }
 
         public Arrow(GraphicsDevice graphicsDevice, 
-            Vector2 centerPos, float angle, float speed = 1, int damage = 1)
+            Vector2 centerPos, float angle, float speed = BASE_SPEED, int damage = 1)
         {
             position = centerPos + offset;
             this.origin = new Vector2(IMAGE_SOURCE_WIDTH / 2, IMAGE_SOURCE_HEIGHT / 2); // pivot point
@@ -60,12 +63,13 @@ namespace PASS3V4
             sourceRec = new Rectangle(0, 0, IMAGE_SOURCE_WIDTH, IMAGE_SOURCE_HEIGHT);
 
             InitializeHitBox(graphicsDevice, IMAGE_SOURCE_WIDTH, IMAGE_SOURCE_HEIGHT);
-
         }
 
         public float GetAngle() => angle;
 
         public Rectangle GetImageSourceRec() => sourceRec;
+
+        public Rectangle GetHitBox() => hitBox;
 
         private void InitializeHitBox(GraphicsDevice graphicsDevice, int hitBoxWidth, int hitBoxHeight)
         {
@@ -94,7 +98,7 @@ namespace PASS3V4
             velocity.Normalize(); // normalize the 
             velocity *= speed;
 
-            degbugHitBox.TranslateTo(hitBox.X, hitBox.Y);
+            if (isDebug) degbugHitBox.TranslateTo(hitBox.X, hitBox.Y);
         }
 
         public void UpdateFlying()
@@ -103,16 +107,19 @@ namespace PASS3V4
             hitBox.X = (int)(position.X - hitBoxWidth / 2);
             hitBox.Y = (int)(position.Y - hitBoxHeight / 2);
 
-            degbugHitBox.TranslateTo(hitBox.X, hitBox.Y);
+            if (isDebug) degbugHitBox.TranslateTo(hitBox.X, hitBox.Y);
         }
 
         public void Draw(SpriteBatch spriteBatch)
         {
             spriteBatch.Draw(img, position - offset, sourceRec, Color.White, angle, origin, 1, SpriteEffects.None, 0);
-            spriteBatch.DrawString(Assets.debugFont, velocity.ToString(), hitBox.Center.ToVector2() - new Vector2(10, 10), Color.White);
 
             // draw the hitbox
-            degbugHitBox.Draw(spriteBatch, Color.Red, false);
-        }
+            if (isDebug)
+            {
+                degbugHitBox.Draw(spriteBatch, Color.Red, false);
+                spriteBatch.DrawString(Assets.debugFont, velocity.ToString(), hitBox.Center.ToVector2() - new Vector2(10, 10), Color.White);
+            }
+         }
     }
 }

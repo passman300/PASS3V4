@@ -45,7 +45,7 @@ namespace PASS3V4
             pixels = Load<Texture2D>("BlankPixel");
 
             loadPath = "Images/Tileset";
-            dungeonTileSetImg = Load<Texture2D>("32x32DungeonTileSetImage");
+            dungeonTileSetImg = Load<Texture2D>("RotatedSetImage");
             weaponSetImg = Load<Texture2D>("WeaponsSetImage");
         }
 
@@ -54,7 +54,7 @@ namespace PASS3V4
         /// </summary>
         /// <typeparam name="T"></typeparam> the type of the asset
         /// <param name="file"></param> file to load
-        /// <returns></returns>
+        /// <returns></returns>\        `       
         private static T Load<T>(string file) => Content.Load<T>($"{loadPath}/{file}");
     }
 }

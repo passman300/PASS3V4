@@ -15,6 +15,7 @@ using Microsoft.Xna.Framework;
         List<TileLayer> frontLayers = new();
         List<TileLayer> backLayers = new();
         List<Rectangle> wallRecs = new();
+        (Rectangle top, Rectangle bottom, Rectangle left, Rectangle right) doorRecs = (new Rectangle(), new Rectangle(), new Rectangle(), new Rectangle());
 
         private string curObjectName;
 
@@ -72,6 +73,18 @@ using Microsoft.Xna.Framework;
                             (int)float.Parse(data.GetParamterValue("y")),
                             (int)float.Parse(data.GetParamterValue("width")),
                             (int)float.Parse(data.GetParamterValue("height"))));
+                            break;
+                        case "TopDoor":
+                            doorRecs.top = new Rectangle((int)float.Parse(data.GetParamterValue("x")),(int)float.Parse(data.GetParamterValue("y")),(int)float.Parse(data.GetParamterValue("width")),(int)float.Parse(data.GetParamterValue("height")));
+                            break;
+                        case "BottomDoor":
+                            doorRecs.bottom = new Rectangle((int)float.Parse(data.GetParamterValue("x")),(int)float.Parse(data.GetParamterValue("y")),(int)float.Parse(data.GetParamterValue("width")),(int)float.Parse(data.GetParamterValue("height")));
+                            break;
+                        case "LeftDoor":
+                            doorRecs.left = new Rectangle((int)float.Parse(data.GetParamterValue("x")),(int)float.Parse(data.GetParamterValue("y")),(int)float.Parse(data.GetParamterValue("width")),(int)float.Parse(data.GetParamterValue("height")));
+                            break;
+                        case "RightDoor":
+                            doorRecs.right = new Rectangle((int)float.Parse(data.GetParamterValue("x")),(int)float.Parse(data.GetParamterValue("y")),(int)float.Parse(data.GetParamterValue("width")),(int)float.Parse(data.GetParamterValue("height")));
                             break;
                     }
                     break;
@@ -176,5 +189,7 @@ using Microsoft.Xna.Framework;
         public TileLayer[] GetBackLayers() => backLayers.ToArray<TileLayer>();
 
         public Rectangle[] GetWallRecs() => wallRecs.ToArray<Rectangle>();
+
+        public (Rectangle, Rectangle, Rectangle, Rectangle) GetDoorRecs() => doorRecs;
     }
 }

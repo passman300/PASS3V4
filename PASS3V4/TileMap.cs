@@ -16,11 +16,21 @@ namespace PASS3V4
 
         public Rectangle[] WallRecs { get; set; }
 
+        public (Rectangle top, Rectangle bottom, Rectangle left, Rectangle right) DoorRec { get; set; }
+
+
         private TileMapReader tileMapReader;
 
         private int splitLayer;
 
-        public TileMap(string filePath, GraphicsDevice graphicsDevice)
+        public static bool isDebug = false;
+
+        public TileMap()
+        {
+
+        }
+
+        public virtual void LoadTileMap(GraphicsDevice graphicsDevice, string filePath) 
         {
             tileMapReader = new TileMapReader(filePath);
 
@@ -29,19 +39,9 @@ namespace PASS3V4
             BackLayers = tileMapReader.GetBackLayers();
             FrontLayers = tileMapReader.GetFrontLayers();
             WallRecs = tileMapReader.GetWallRecs();
+            //DoorRec = tileMapReader.GetDoorRec();
         }
 
-        public virtual void Update(GameTime gameTime)
-        {
-            for (int i = 0; i < BackLayers.Length; i++)
-            {
-                BackLayers[i].Update(gameTime);
-            }
-            for (int i = 0; i < FrontLayers.Length; i++)
-            {
-                FrontLayers[i].Update(gameTime);
-            }
-        }
 
         public virtual void Update(GameTime gameTime, Player player, KeyboardState kb, KeyboardState prevKb) {   }
         public virtual void Update(GameTime gameTime, Player player, KeyboardState kb, KeyboardState prevKb, MouseState mouse, MouseState prevMouse) { }
@@ -60,6 +60,10 @@ namespace PASS3V4
             {
                 BackLayers[i].Draw(spriteBatch);
             }
+        }
+
+        public virtual void DrawEntities(SpriteBatch spriteBatch)
+        {
         }
 
         public void DrawWallHitboxes(SpriteBatch spriteBatch)

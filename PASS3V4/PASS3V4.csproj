@@ -38,7 +38,6 @@
     <Folder Include="Libaries\" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="bin\Debug\net6.0\Tiled\32x32DungeonTileSet.tsx" />
     <None Include="bin\Debug\net6.0\Tiled\BasicRoom.tmx">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>

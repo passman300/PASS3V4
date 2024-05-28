@@ -41,6 +41,11 @@ namespace PASS3V4
         protected GameRectangle debugHurtBox;
         protected GameRectangle debugAnimBox;
 
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="content"></param>
+        /// <param name="graphicsDevice"></param>
         public Entity(ContentManager content, GraphicsDevice graphicsDevice)
         {
             Content = content;
@@ -69,12 +74,10 @@ namespace PASS3V4
 
         public virtual void Update(GameTime gameTime, KeyboardState kb, KeyboardState prevKb, MouseState mouse, MouseState prevMouse, Rectangle[] wallRecs = null) { }
 
-        public virtual void Draw(SpriteBatch spriteBatch, bool debug = false)
+        public virtual void Draw(SpriteBatch spriteBatch, bool isDebug = false)
         {
-            if (debug)
+            if (isDebug)
             {
-                spriteBatch.Draw(Assets.pixels, hurtBox, Color.Blue * 0.5f);
-
                 spriteBatch.Draw(Assets.pixels, hurtBox, Color.Blue * 0.5f);
             }
         }

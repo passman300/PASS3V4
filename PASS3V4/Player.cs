@@ -49,6 +49,8 @@ namespace PASS3V4
         private Weapon[] weapons = new Weapon[NUM_WEAPONS];
         private int activeWeapon = 0;
 
+        public static bool isDebug = false;
+
         public Player(ContentManager content, GraphicsDevice graphicsDevice, string csvFilePath) : base(content, graphicsDevice)
         {
             position = new Vector2(100, 100);
@@ -75,6 +77,12 @@ namespace PASS3V4
             weapons[index] = weapon;
         }
 
+        public (bool IsShot, Arrow Arrow) GetFlyingArrow()
+        {
+            if (weapons[activeWeapon].GetType() == typeof(Bow)) return ((Bow)weapons[activeWeapon]).GetFlyingArrow();
+
+            return (false, null);
+        }
 
         public override void Update(GameTime gameTime, KeyboardState kb, KeyboardState prevKb, MouseState mouse, MouseState prevMouse, Rectangle[] wallRecs = null)
         {
@@ -185,11 +193,14 @@ namespace PASS3V4
                 feetRec.Y = hurtBox.Y + FEET_OFFSET_Y;
             }
 
-            debugFeetRec.TranslateTo(feetRec.X, feetRec.Y);
-            debugHurtBox.TranslateTo(hurtBox.X, hurtBox.Y);
-            debugAnimBox.TranslateTo(anim[(int)state].GetDestRec().X, anim[(int)state].GetDestRec().Y);
-
             centerPosition = hurtBox.Center.ToVector2();
+
+            if (isDebug)
+            {
+                debugFeetRec.TranslateTo(feetRec.X, feetRec.Y);
+                debugHurtBox.TranslateTo(hurtBox.X, hurtBox.Y);
+                debugAnimBox.TranslateTo(anim[(int)state].GetDestRec().X, anim[(int)state].GetDestRec().Y);
+            }
         }
 
         private void UpdateIdle(GameTime gameTime, KeyboardState kb)
@@ -248,7 +259,7 @@ namespace PASS3V4
             return (isCollided, new Vector2(newX, newY));
         }
 
-        public override void Draw(SpriteBatch spriteBatch, bool debug = false)
+        public override void Draw(SpriteBatch spriteBatch, bool filler = false)
         {
             if (direction == LEFT)
             {
@@ -261,7 +272,7 @@ namespace PASS3V4
 
             weapons[activeWeapon].Draw(spriteBatch);
 
-            if (true)
+            if (isDebug)
             {
                 spriteBatch.DrawString(Assets.debugFont, string.Format(" position: X: {0}, Y: {1}", position.X, position.Y), new Vector2(10, 10), Color.White);
                 spriteBatch.DrawString(Assets.debugFont, direction.ToString(), new Vector2(10, 30), Color.White);

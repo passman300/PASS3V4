@@ -13,10 +13,10 @@ namespace PASS3V4
         private GraphicsDeviceManager graphics;
         private SpriteBatch spriteBatch;
 
-        Room room;
-        Player player;
+        public static Random rng = new Random();
 
-        Weapon weapon;
+        Level level;
+        Player player;
 
         Rectangle tempRec = new Rectangle(480, 400, 90, 50);
 
@@ -26,10 +26,10 @@ namespace PASS3V4
         MouseState prevMouse;
 
         //Step 1: Decide the target Update framerate desired
-        int updateFPS = 70;
+        int updateFPS = 71;
 
         //Step 2: Decide the target Draw framerate desired
-        int drawFPS = 70;
+        int drawFPS = 71;
 
         //Step 3: Calculate how many updates need to execute before a Draw occurs
         int updateTarget;
@@ -68,10 +68,10 @@ namespace PASS3V4
             Assets.Content = Content;
             Assets.Initialize();
 
-            room = new Room("Tiled/BasicRoom.tmx", GraphicsDevice);
+            level = new Level(1);
+            level.Generate(GraphicsDevice);
 
             player = new Player(Content, GraphicsDevice, "Player/Player.csv");
-
         }
 
         protected override void Update(GameTime gameTime)
@@ -85,21 +85,7 @@ namespace PASS3V4
             prevMouse = mouse;
             mouse = Mouse.GetState();
 
-            // TODO: Add your update logic here
-            //player.Update(gameTime, Keyboard.GetState(), Keyboard.GetState());
-
-            //for (int i = 0; i < room.BackLayers.Length; i++)
-            //{
-            //    room.BackLayers[i].Update(gameTime);
-            //}
-
-            //for (int i = 0; i < room.FrontLayers.Length; i++)
-            //{
-            //    room.FrontLayers[i].Update(gameTime);
-            //}
-
-            room.Update(gameTime, player, kb, prevKb, mouse, prevMouse);
-
+            level.Update(gameTime, player, kb, prevKb, mouse, prevMouse);
 
             //Step 7: Update the number of updates passed since the last Draw
             updateCounter++;
@@ -109,7 +95,6 @@ namespace PASS3V4
             //I think you can see the pattern here...
             if (updateCounter == updateTarget)
             {
-
                 //Step 9: Reset the update counter, which will trigger a Draw
                 updateCounter = 0;
             }
@@ -127,13 +112,8 @@ namespace PASS3V4
                 GraphicsDevice.Clear(Color.Black);
 
                 spriteBatch.Begin();
-                room.DrawBack(spriteBatch);
 
-                player.Draw(spriteBatch, false);
-
-                room.DrawFront(spriteBatch);
-
-                room.DrawWallHitboxes(spriteBatch);
+                level.Draw(spriteBatch, player);
 
                 spriteBatch.End();
 

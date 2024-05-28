@@ -8,14 +8,12 @@ namespace PASS3V4
 {
     public class Stack<T>
     {
-        private List<T> stack = new List<T>(); // <T>
-
-        public Stack() { }
+        private List<T> stack = new(); // <T>
 
         public T Top()
         {
             if (stack.Count == 0) throw new Exception("Stack is empty.");
-            return stack[stack.Count - 1];
+            return stack[^1];
         }
 
         public T Pop()

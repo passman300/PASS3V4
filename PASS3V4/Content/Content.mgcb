@@ -116,7 +116,7 @@
 /processorParam:TextureFormat=Color
 /build:Images/Sprites/Player.png
 
-#begin Images/TileSet/32x32DungeonTileSetImage.png
+#begin Images/TileSet/RotatedSetImage.png
 /importer:TextureImporter
 /processor:TextureProcessor
 /processorParam:ColorKeyColor=255,0,255,255
@@ -126,7 +126,7 @@
 /processorParam:ResizeToPowerOfTwo=False
 /processorParam:MakeSquare=False
 /processorParam:TextureFormat=Color
-/build:Images/TileSet/32x32DungeonTileSetImage.png
+/build:Images/TileSet/RotatedSetImage.png
 
 #begin Images/TileSet/WeaponsSetImage.png
 /importer:TextureImporter

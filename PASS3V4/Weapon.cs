@@ -22,6 +22,7 @@ namespace PASS3V4
 
         public int Damage { get; protected set; }
 
+
         protected float rotationSpeed;
         protected float rotationMultiplier = 1;
 
@@ -44,6 +45,7 @@ namespace PASS3V4
         protected float hitBoxHeight;
         
         protected GameRectangle degbugHitBox;
+        public bool isDebug = false;
 
         public Weapon(GraphicsDevice graphicsDevice, Rectangle imgSourceRec, Vector2 centerPosition, Vector2 offset, Vector2 origin, float rotationSpeed, float angle = 0, bool isAnimated = false)
         {
@@ -78,6 +80,8 @@ namespace PASS3V4
         }
 
         public float GetAngle() => angle;
+        public Rectangle GetHitBox() => hitBox;
+
 
         protected virtual void InitializeHitBox(GraphicsDevice graphicsDevice, int hitBoxWidth, int hitBoxHeight)
         {
@@ -104,7 +108,7 @@ namespace PASS3V4
 
             hitBox.Y = (int)(Math.Abs(offset.Y) / 2 * Math.Sin(angle - MathHelper.PiOver2) + position.Y - hitBoxHeight / 2);
 
-            degbugHitBox.TranslateTo(hitBox.X, hitBox.Y);
+            if (isDebug) degbugHitBox.TranslateTo(hitBox.X, hitBox.Y);
 
             if (isFollowMouse) angle = (float)Math.Atan2(mouse.Y - position.Y, mouse.X - position.X);
 
@@ -130,7 +134,7 @@ namespace PASS3V4
             spriteBatch.DrawString(Assets.debugFont, angle.ToString(), new Vector2(10, 70), Color.White);
 
             // draw the hitbox
-            degbugHitBox.Draw(spriteBatch, Color.Red, false);
+            if (isDebug) degbugHitBox.Draw(spriteBatch, Color.Red, false);
         }
 
     }
