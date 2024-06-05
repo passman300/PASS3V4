@@ -12,7 +12,7 @@ namespace PASS3V4
         public bool IsAnimated { get; set; }
         public int AnimationDur { get; set; }
         public Texture2D Image { get; set; }
-        public OrderedSet<Rectangle> HitBoxs { get; set; }
+        public OrderedSet<Rectangle> HitBoxes { get; set; }
 
         public OrderedSet<int> Frames { get; set; }
 
@@ -20,7 +20,7 @@ namespace PASS3V4
         {
             Frames = new OrderedSet<int>();
 
-            HitBoxs = new OrderedSet<Rectangle>();
+            HitBoxes = new OrderedSet<Rectangle>();
         }
 
         //public void SetAllProperties(bool isCollision, int damage, bool isAnimated, int animationDur)

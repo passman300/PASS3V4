@@ -16,7 +16,7 @@ namespace PASS3V4
             Bow
         }
 
-        protected const int WEAPON_SET_IMG_WIDTH = 4;
+        protected const int WEAPON_SET_IMG_WIdTH = 4;
 
         public WeaponType Id { get; protected set; }
 

@@ -20,11 +20,12 @@ namespace PASS3V4
 
         private const int DAMAGE = 5;
         private const int BASE_COOLDOWN = 500;
+        private const int CHARGE_TIME = 3000;
 
-        private const int IMAGE_SOURCE_X = 0;
-        private const int IMAGE_SOURCE_Y = 384;
-        private const int IMAGE_SOURCE_WIDTH = 32;
-        private const int IMAGE_SOURCE_HEIGHT = 64;
+        private const int IMG_SRC_X = 0;
+        private const int IMG_SRC_Y = 384;
+        private const int IMG_SRC_WIDTH = 32;
+        private const int IMG_SRC_HEIGHT = 64;
 
         private BowState state = BowState.Idle;
 
@@ -33,21 +34,22 @@ namespace PASS3V4
         private bool isShoot = false;
 
         private Timer coolDown = new Timer(BASE_COOLDOWN, true); // cool down time before next arrow can be charged (500 ms)
+        private Timer chargeTimer = new Timer(CHARGE_TIME, false);
 
         public Bow(GraphicsDevice graphicsDevice, Vector2 centerPosition) : 
-            base(graphicsDevice, new Rectangle(IMAGE_SOURCE_X, IMAGE_SOURCE_Y, IMAGE_SOURCE_WIDTH, IMAGE_SOURCE_HEIGHT), centerPosition, new Vector2(0, 0), new Vector2(IMAGE_SOURCE_WIDTH / 2, IMAGE_SOURCE_HEIGHT / 2), true, true, 2)
+            base(graphicsDevice, new Rectangle(IMG_SRC_X, IMG_SRC_Y, IMG_SRC_WIDTH, IMG_SRC_HEIGHT), centerPosition, new Vector2(0, 0), new Vector2(IMG_SRC_WIDTH / 2, IMG_SRC_HEIGHT / 2), true, true, 2)
         {
             Id = WeaponType.Bow;
             
-            frames[(int)BowState.Idle] = Util.Crop(weaponSetImg, new Rectangle(IMAGE_SOURCE_X, IMAGE_SOURCE_Y, IMAGE_SOURCE_WIDTH, IMAGE_SOURCE_HEIGHT));
-            frames[(int)BowState.Charging] = Util.Crop(weaponSetImg, new Rectangle(IMAGE_SOURCE_X + IMAGE_SOURCE_WIDTH, IMAGE_SOURCE_Y, IMAGE_SOURCE_WIDTH, IMAGE_SOURCE_HEIGHT));
+            frames[(int)BowState.Idle] = Util.Crop(weaponSetImg, new Rectangle(IMG_SRC_X, IMG_SRC_Y, IMG_SRC_WIDTH, IMG_SRC_HEIGHT));
+            frames[(int)BowState.Charging] = Util.Crop(weaponSetImg, new Rectangle(IMG_SRC_X + IMG_SRC_WIDTH, IMG_SRC_Y, IMG_SRC_WIDTH, IMG_SRC_HEIGHT));
         }
 
         public (bool IsShoot, Arrow Arrow) GetFlyingArrow() => (isShoot, flyingArrow);
 
         private void CreateArrow(GraphicsDevice graphicsDevice)
         {
-            chargingArrow = new Arrow(graphicsDevice, hitBox.Center.ToVector2(), angle, 10);
+            chargingArrow = new Arrow(graphicsDevice, Arrow.BASE_SPEED, angle, hitBox.Center.ToVector2(), Arrow.BASE_DAMAGE);
         }
 
 
@@ -57,8 +59,15 @@ namespace PASS3V4
 
             coolDown.Update(gameTime);
 
+            
+
             if (mouse.LeftButton == ButtonState.Pressed && coolDown.IsFinished()) // charge arrow
             {
+                // check if the charge timer has started
+                if (chargeTimer.IsInactive()) 
+                    chargeTimer.ResetTimer(true);
+
+                chargeTimer.Update(gameTime);
                 state = BowState.Charging;
 
                 if (chargingArrow == null)
@@ -67,13 +76,14 @@ namespace PASS3V4
                 }
 
                 isShoot = false;
-                chargingArrow.UpdateCharging(position, angle);
+                chargingArrow.UpdateCharging(position, angle, (float)(chargeTimer.GetTimePassed() / CHARGE_TIME));
+                System.Diagnostics.Debug.WriteLine(chargeTimer.GetTimePassed());
             }
             else if (prevMouse.LeftButton == ButtonState.Pressed && mouse.LeftButton != ButtonState.Pressed && chargingArrow != null) // shoot the arrow
             {
                 if (chargingArrow != null)
                 {
-                    chargingArrow.State = Arrow.ArrowState.Flying;
+                    chargingArrow.PlayerState = Arrow.ArrowState.Flying;
                     flyingArrow = chargingArrow; 
                     isShoot = true;
                     chargingArrow = null;
@@ -81,6 +91,7 @@ namespace PASS3V4
                 state = BowState.Idle;
 
                 coolDown.ResetTimer(true);
+                chargeTimer.ResetTimer(false);
             }
             else if (prevMouse.LeftButton != ButtonState.Pressed && mouse.LeftButton != ButtonState.Pressed) // idling the bow, not charging
             {

@@ -1,6 +1,7 @@
 ﻿using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Content;
 using Microsoft.Xna.Framework.Graphics;
+using System.Collections.Generic;
 
 
 namespace PASS3V4
@@ -13,14 +14,14 @@ namespace PASS3V4
 
         public bool IsFront { get; set; }
 
-        public Tile[] Tiles { get; private set; }
+        public List<Tile> Tiles { get; private set; } = new List<Tile>();
 
         public TileLayer(string name, int layerOrder, int width, int height)
         {
             Name = name;
             LayerOrder = layerOrder;
 
-            Tiles = new Tile[width * height];
+            //Tiles = new Tile[width * height];
 
             IsFront = false;
         }
@@ -38,9 +39,14 @@ namespace PASS3V4
             Tiles[index] = tile;
         }
 
+        public void AddTile(Tile tile)
+        {
+            Tiles.Add(tile);
+        }
+
         public void Update(GameTime gameTime)
         {
-            for (int i = 0; i < Tiles.Length; i++)
+            for (int i = 0; i < Tiles.Count; i++)
             {
                 Tiles[i].Update(gameTime);
             }
@@ -48,7 +54,7 @@ namespace PASS3V4
 
         public void Draw(SpriteBatch spriteBatch)
         {
-            for (int i = 0; i < Tiles.Length; i++)
+            for (int i = 0; i < Tiles.Count; i++)
             {
                 Tiles[i].Draw(spriteBatch);
             }

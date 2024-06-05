@@ -12,14 +12,14 @@ namespace PASS3V4
 
         private const float BASE_ROTATION_SPEED = 0.1f;
 
-        private const int IMAGE_SOURCE_X = 64;
-        private const int IMAGE_SOURCE_Y = 128;
-        private const int IMAGE_SOURCE_WIDTH = 32;
-        private const int IMAGE_SOURCE_HEIGHT = 64;
+        private const int IMG_SRC_X = 64;
+        private const int IMG_SRC_Y = 128;
+        private const int IMG_SRC_WIDTH = 32;
+        private const int IMG_SRC_HEIGHT = 64;
 
         // QUESTION: ask about maggic values
         public LargeSword(GraphicsDevice graphicsDevice, Vector2 centerPosition) :
-            base(graphicsDevice, new Rectangle(IMAGE_SOURCE_X, IMAGE_SOURCE_Y, IMAGE_SOURCE_WIDTH, IMAGE_SOURCE_HEIGHT), centerPosition, new Vector2(0, -IMAGE_SOURCE_HEIGHT), new Vector2(IMAGE_SOURCE_WIDTH / 2, IMAGE_SOURCE_HEIGHT), BASE_ROTATION_SPEED)
+            base(graphicsDevice, new Rectangle(IMG_SRC_X, IMG_SRC_Y, IMG_SRC_WIDTH, IMG_SRC_HEIGHT), centerPosition, new Vector2(0, -IMG_SRC_HEIGHT), new Vector2(IMG_SRC_WIDTH / 2, IMG_SRC_HEIGHT), BASE_ROTATION_SPEED)
         {
             Id = WeaponType.LargeSword;
             

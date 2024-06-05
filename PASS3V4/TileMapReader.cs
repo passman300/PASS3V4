@@ -4,7 +4,8 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using Microsoft.Xna.Framework;
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                    namespace PASS3V4
+
+namespace PASS3V4
 {
     public class TileMapReader
     {
@@ -12,10 +13,7 @@ using Microsoft.Xna.Framework;
 
         Dictionary<int, TileSetFileIO> tileSets = new();
 
-        List<TileLayer> frontLayers = new();
-        List<TileLayer> backLayers = new();
-        List<Rectangle> wallRecs = new();
-        (Rectangle top, Rectangle bottom, Rectangle left, Rectangle right) doorRecs = (new Rectangle(), new Rectangle(), new Rectangle(), new Rectangle());
+        RoomTemplate roomTemplate = new();
 
         private string curObjectName;
 
@@ -69,22 +67,29 @@ using Microsoft.Xna.Framework;
                     switch (tokenStack.Top().GetParamterValue("name"))
                     {
                         case "WallRecs":
-                            wallRecs.Add(new Rectangle((int)float.Parse(data.GetParamterValue("x")),
+                            roomTemplate.WallRecs.Add(new Rectangle((int)float.Parse(data.GetParamterValue("x")),
                             (int)float.Parse(data.GetParamterValue("y")),
                             (int)float.Parse(data.GetParamterValue("width")),
                             (int)float.Parse(data.GetParamterValue("height"))));
                             break;
-                        case "TopDoor":
-                            doorRecs.top = new Rectangle((int)float.Parse(data.GetParamterValue("x")),(int)float.Parse(data.GetParamterValue("y")),(int)float.Parse(data.GetParamterValue("width")),(int)float.Parse(data.GetParamterValue("height")));
+                        case "TopDoorRec":
+                            roomTemplate.DoorRecs.top = new Rectangle((int)float.Parse(data.GetParamterValue("x")),(int)float.Parse(data.GetParamterValue("y")),(int)float.Parse(data.GetParamterValue("width")),(int)float.Parse(data.GetParamterValue("height")));
+                            roomTemplate.SpawnPoints.top = new Vector2(roomTemplate.DoorRecs.top.X + roomTemplate.DoorRecs.top.Width / 2, roomTemplate.DoorRecs.top.Bottom + Room.SPAWN_OFFSET);
                             break;
-                        case "BottomDoor":
-                            doorRecs.bottom = new Rectangle((int)float.Parse(data.GetParamterValue("x")),(int)float.Parse(data.GetParamterValue("y")),(int)float.Parse(data.GetParamterValue("width")),(int)float.Parse(data.GetParamterValue("height")));
+                        case "BottomDoorRec":
+                            roomTemplate.DoorRecs.bottom = new Rectangle((int)float.Parse(data.GetParamterValue("x")),(int)float.Parse(data.GetParamterValue("y")),(int)float.Parse(data.GetParamterValue("width")),(int)float.Parse(data.GetParamterValue("height")));
+                            roomTemplate.SpawnPoints.bottom = new Vector2(roomTemplate.DoorRecs.bottom.X + roomTemplate.DoorRecs.bottom.Width / 2, roomTemplate.DoorRecs.bottom.Top - Room.SPAWN_OFFSET);
                             break;
-                        case "LeftDoor":
-                            doorRecs.left = new Rectangle((int)float.Parse(data.GetParamterValue("x")),(int)float.Parse(data.GetParamterValue("y")),(int)float.Parse(data.GetParamterValue("width")),(int)float.Parse(data.GetParamterValue("height")));
+                        case "LeftDoorRec":
+                            roomTemplate.DoorRecs.left = new Rectangle((int)float.Parse(data.GetParamterValue("x")),(int)float.Parse(data.GetParamterValue("y")),(int)float.Parse(data.GetParamterValue("width")),(int)float.Parse(data.GetParamterValue("height")));
+                            roomTemplate.SpawnPoints.left = new Vector2(roomTemplate.DoorRecs.left.Right + Room.SPAWN_OFFSET, roomTemplate.DoorRecs.left.Y + roomTemplate.DoorRecs.left.Height / 2);
                             break;
-                        case "RightDoor":
-                            doorRecs.right = new Rectangle((int)float.Parse(data.GetParamterValue("x")),(int)float.Parse(data.GetParamterValue("y")),(int)float.Parse(data.GetParamterValue("width")),(int)float.Parse(data.GetParamterValue("height")));
+                        case "RightDoorRec":
+                            roomTemplate.DoorRecs.right = new Rectangle((int)float.Parse(data.GetParamterValue("x")),(int)float.Parse(data.GetParamterValue("y")),(int)float.Parse(data.GetParamterValue("width")),(int)float.Parse(data.GetParamterValue("height")));
+                            roomTemplate.SpawnPoints.right = new Vector2(roomTemplate.DoorRecs.right.Left - Room.SPAWN_OFFSET, roomTemplate.DoorRecs.right.Y + roomTemplate.DoorRecs.right.Height / 2);
+                            break;
+                        case "ExitRec":
+                            roomTemplate.ExitRec = new Rectangle((int)float.Parse(data.GetParamterValue("x")), (int)float.Parse(data.GetParamterValue("y")), (int)float.Parse(data.GetParamterValue("width")), (int)float.Parse(data.GetParamterValue("height")));
                             break;
                     }
                     break;
@@ -92,13 +97,16 @@ using Microsoft.Xna.Framework;
                     tileSets[int.Parse(data.GetParamterValue("firstgid"))] = new TileSetFileIO("Tiled/" + data.GetParamterValue("source"));
                     break;
                 case "property":
-                    backLayers[^1].IsFront = bool.Parse(data.GetParamterValue("value"));
-
-                    if (backLayers[^1].IsFront)
+                    
+                    // find what type of property it is
+                    switch (data.GetParamterValue("name"))
                     {
-                        frontLayers.Add(backLayers[^1]);
-                        frontLayers[^1].IsFront = true;
-                        backLayers.RemoveAt(backLayers.Count - 1);
+                        case "MaxMobs":
+                            roomTemplate.MaxMobs = int.Parse(data.GetParamterValue("value"));
+                            break;
+                        case "MinMobs":
+                            roomTemplate.MinMobs = int.Parse(data.GetParamterValue("value"));
+                            break;
                     }
                     break;
             }
@@ -120,7 +128,9 @@ using Microsoft.Xna.Framework;
                     width = int.Parse(data.GetParamterValue("width"));
                     height = int.Parse(data.GetParamterValue("height"));
 
-                    backLayers.Add(new TileLayer(curLayerName, curLayerOrder, width, height));
+                    if (data.GetParamterValue("name").Contains("Door")) 
+                        roomTemplate.DoorLayers.Add(new TileLayer(curLayerName, curLayerOrder, width, height));
+                    else roomTemplate.BackLayers.Add(new TileLayer(curLayerName, curLayerOrder, width, height));
 
                     tokenStack.Push(data);
                     break;
@@ -145,20 +155,35 @@ using Microsoft.Xna.Framework;
             while (!reader.EndOfStream && new XMLData(line).notXML)
             {
                 line = line.TrimEnd(',');
-                int[] tileIDs = line.Split(',').Select(int.Parse).ToArray();
+                int[] tileIds = line.Split(',').Select(int.Parse).ToArray();
 
-                for (int i = 0; i < tileIDs.Length; i++)
+                for (int i = 0; i < tileIds.Length; i++)
                 {
-                    tileIDs[i] = Math.Max(0, tileIDs[i] - 1);
+                    tileIds[i] = Math.Max(0, tileIds[i] - 1);
 
-                    pos.X = i * Tile.WIDTH;
+                    pos.X = i * Tile.WIdTH;
 
-                    int tile = tileIDs[i];
+                    int tile = tileIds[i];
                     Dictionary<int, TileTemplate> tileData = new() { [tile] = tileSets[1].tileDict[tile] };
 
 
-                    if (frontLayers.Count > 0 && (frontLayers[^1].Tiles[^1] == null)) frontLayers[^1].LoadTile(new Tile(graphicsDevice, Assets.dungeonTileSetImg, tile, pos, tileData[tile]), count);
-                    else backLayers[^1].LoadTile(new Tile(graphicsDevice, Assets.dungeonTileSetImg, tile, pos, tileData[tile]), count);
+                    if (roomTemplate.DoorLayers.Count > 0 && tokenStack.Top(1).GetParamterValue("name").Contains("Door"))
+                    {
+                        if (tileData[tile].IsAnimated) roomTemplate.DoorLayers[^1].AddTile(new AnimatedTile(graphicsDevice, Assets.dungeonTileSetImg, tile, pos, tileData[tile]));
+                        else
+                            roomTemplate.DoorLayers[^1].AddTile(new Tile(graphicsDevice, Assets.dungeonTileSetImg, tile, pos, tileData[tile]));
+                    }
+                    else if (roomTemplate.FrontLayers.Count > 0 && (roomTemplate.FrontLayers[^1].Tiles[^1] == null))
+                    {
+                        if (tileData[tile].IsAnimated) roomTemplate.FrontLayers[^1].AddTile(new AnimatedTile(graphicsDevice, Assets.dungeonTileSetImg, tile, pos, tileData[tile]));
+                        else roomTemplate.FrontLayers[^1].AddTile(new Tile(graphicsDevice, Assets.dungeonTileSetImg, tile, pos, tileData[tile]));
+                    }
+                    else
+                    {
+                        if (tileData[tile].IsAnimated) roomTemplate.BackLayers[^1].AddTile(new AnimatedTile(graphicsDevice, Assets.dungeonTileSetImg, tile, pos, tileData[tile])); 
+                        else roomTemplate.BackLayers[^1].AddTile(new Tile(graphicsDevice, Assets.dungeonTileSetImg, tile, pos, tileData[tile]));
+                    }
+
 
                     count++;
                     //tiles.Add(new Tile(graphicsDevice, Assets.dungeonTileSetImg, tile, pos, tileData[tile]));
@@ -184,12 +209,14 @@ using Microsoft.Xna.Framework;
             }
         }
 
-        public TileLayer[] GetFrontLayers() => frontLayers.ToArray<TileLayer>();
+        public RoomTemplate GetRoomTemplate() => roomTemplate;
 
-        public TileLayer[] GetBackLayers() => backLayers.ToArray<TileLayer>();
+        public TileLayer[] GetFrontLayers() => roomTemplate.FrontLayers.ToArray<TileLayer>();
 
-        public Rectangle[] GetWallRecs() => wallRecs.ToArray<Rectangle>();
+        public TileLayer[] GetBackLayers() => roomTemplate.BackLayers.ToArray<TileLayer>();
 
-        public (Rectangle, Rectangle, Rectangle, Rectangle) GetDoorRecs() => doorRecs;
+        public Rectangle[] GetWallRecs() => roomTemplate.WallRecs.ToArray<Rectangle>();
+
+        public (Rectangle, Rectangle, Rectangle, Rectangle) GetDoorRecs() => roomTemplate.DoorRecs;
     }
 }

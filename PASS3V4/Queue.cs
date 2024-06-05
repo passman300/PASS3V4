@@ -4,7 +4,7 @@ namespace PASS3V4
 {
     public class Queue<T>
     {
-        private List<T> queue = new();
+        protected List<T> queue = new();
 
         public T Dequeue()
         {
@@ -18,8 +18,15 @@ namespace PASS3V4
             queue.Add(item);
         }
 
+        public T Peek() => queue[0];
+
+        public T Peek(int index) => queue[index];
+
+        public T PeekLast() => queue[^1];
+
         public bool IsEmpty() => queue.Count == 0;
 
         public int Size() => queue.Count;
+
     }
 }

@@ -26,8 +26,6 @@ namespace PASS3V4
 
         private int currentTileId;
 
-        private int animationDurSum;
-
         public TileSetFileIO(string filePath)
         {
             this.filePath = filePath;
@@ -114,7 +112,7 @@ namespace PASS3V4
             int width = (int)(float.Parse(data.GetParamterValue("width")));
             int height = (int)(float.Parse(data.GetParamterValue("height")));
 
-            tileDict[currentTileId].HitBoxs.Add(new Rectangle(offsetX, offsetY, width, height));
+            tileDict[currentTileId].HitBoxes.Add(new Rectangle(offsetX, offsetY, width, height));
         }
 
         private void ReadHeader(XMLData data)

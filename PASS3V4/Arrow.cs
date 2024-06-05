@@ -6,13 +6,11 @@ using Microsoft.Xna.Framework.Content;
 using System.ComponentModel.Design.Serialization;
 using Microsoft.Xna.Framework.Input;
 using System.Reflection.Metadata;
-using static PASS3V4.Bow;
-using static PASS3V4.Player;
 
 
 namespace PASS3V4
 {
-    public class Arrow
+    public class Arrow : Projectile
     {
         public enum ArrowState 
         {
@@ -20,105 +18,79 @@ namespace PASS3V4
             Flying
         }
 
-        public int Damage { get; private set; }
+        public const int IMG_SRC_X = 64;
+        public const int IMG_SRC_Y = 384;
+        public const int IMG_SRC_WIDTH = 48;
+        public const int IMG_SRC_HEIGHT = 32;
 
-        public const int IMAGE_SOURCE_X = 64;
-        public const int IMAGE_SOURCE_Y = 384;
-        public const int IMAGE_SOURCE_WIDTH = 48;
-        public const int IMAGE_SOURCE_HEIGHT = 32;
+        public const int BASE_SPEED = 10;
+        public const int BASE_DAMAGE = 5;
 
-        private const int BASE_SPEED = 10;
-
-        private static Texture2D img = Util.Crop(Assets.weaponSetImg, new Rectangle(IMAGE_SOURCE_X, IMAGE_SOURCE_Y, IMAGE_SOURCE_WIDTH, IMAGE_SOURCE_HEIGHT));
-        private Rectangle sourceRec;
-
-        private Vector2 velocity;
-        private float speed;
-
-        private float angle;
-
-        private Vector2 position; // should start from the center of the player
-        private Vector2 offset;
-        private Vector2 origin;
-
-        private Rectangle hitBox;
-        private float hitBoxWidth;
-        private float hitBoxHeight;
+        private static Texture2D img = Util.Crop(Assets.weaponSetImg, new Rectangle(IMG_SRC_X, IMG_SRC_Y, IMG_SRC_WIDTH, IMG_SRC_HEIGHT));
 
         public static bool isDebug = false;
         private GameRectangle degbugHitBox;
 
-        public ArrowState State { get; set; }
+        public int Damage { get; private set; }
 
-        public Arrow(GraphicsDevice graphicsDevice, 
-            Vector2 centerPos, float angle, float speed = BASE_SPEED, int damage = 1)
+        public ArrowState PlayerState { get; set; }
+
+        public Arrow(GraphicsDevice graphicsDevice, float speed, float angle, Vector2 centerPos, int damage = BASE_DAMAGE):
+            base(graphicsDevice, img, new Rectangle(0, 0, IMG_SRC_WIDTH, IMG_SRC_HEIGHT), speed, angle, centerPos, new Vector2(0,0), new Vector2(IMG_SRC_WIDTH / 2, IMG_SRC_HEIGHT / 2), damage)
         {
-            position = centerPos + offset;
-            this.origin = new Vector2(IMAGE_SOURCE_WIDTH / 2, IMAGE_SOURCE_HEIGHT / 2); // pivot point
 
-            this.angle = angle;
-            this.speed = speed;
-            this.Damage = damage;
 
-            sourceRec = new Rectangle(0, 0, IMAGE_SOURCE_WIDTH, IMAGE_SOURCE_HEIGHT);
-
-            InitializeHitBox(graphicsDevice, IMAGE_SOURCE_WIDTH, IMAGE_SOURCE_HEIGHT);
+            InitializeHitBox(graphicsDevice, IMG_SRC_WIDTH, IMG_SRC_HEIGHT);
         }
-
-        public float GetAngle() => angle;
-
-        public Rectangle GetImageSourceRec() => sourceRec;
-
-        public Rectangle GetHitBox() => hitBox;
 
         private void InitializeHitBox(GraphicsDevice graphicsDevice, int hitBoxWidth, int hitBoxHeight)
         {
-            this.hitBoxWidth = hitBoxWidth;
-            this.hitBoxHeight = hitBoxHeight;
+            HitBoxWidth = hitBoxWidth;
+            HitBoxHeight = hitBoxHeight;
 
-            hitBox = new Rectangle((int)(position.X) - hitBoxWidth / 2, (int)(position.Y) - hitBoxHeight, hitBoxWidth, hitBoxHeight);
-            degbugHitBox = new GameRectangle(graphicsDevice, hitBox);
+            HitBox = new Rectangle((int)(Position.X) - hitBoxWidth / 2, (int)(Position.Y) - hitBoxHeight, hitBoxWidth, hitBoxHeight);
+            degbugHitBox = new GameRectangle(graphicsDevice, HitBox);
         }
 
-        public void UpdateCharging(Vector2 position, float angle)
+        public void UpdateCharging(Vector2 centerPos, float angle, float percentCharged = 1f)
         {
             // update the position of the weapon 
-            this.position = position + offset;
+            Position = centerPos + Offset;
 
             // update the angle 
-            this.angle = angle;
+            Angle = angle;
 
             // update the hitbox of the weapon
-            hitBox.X = (int)(position.X - hitBoxWidth / 2);
-            hitBox.Y = (int)(position.Y - hitBoxHeight / 2);
+            // HitBox = new Rectangle((int)(position.X - HitBoxWidth / 2), (int)(position.Y - HitBoxHeight / 2), (int)HitBoxWidth, (int)HitBoxHeight);
+            HitBox = new Rectangle((int)Position.X, (int)Position.Y, (int)HitBoxWidth, (int)HitBoxHeight);
 
-            velocity.X = (float)Math.Cos(angle);
-            velocity.Y = (float)Math.Sin(angle);
+            // update the velocity based on the angle
+            Velocity = new Vector2((float)Math.Cos(angle), (float)Math.Sin(angle));
 
-            velocity.Normalize(); // normalize the 
-            velocity *= speed;
+            Velocity.Normalize(); // normalize the vector
+            Velocity *= Speed * percentCharged; // multiply the vector by the speed
 
-            if (isDebug) degbugHitBox.TranslateTo(hitBox.X, hitBox.Y);
+            // update the position of the hitbox
+            if (isDebug) degbugHitBox.TranslateTo(HitBox.X, HitBox.Y);
         }
 
         public void UpdateFlying()
         {
-            position += velocity;
-            hitBox.X = (int)(position.X - hitBoxWidth / 2);
-            hitBox.Y = (int)(position.Y - hitBoxHeight / 2);
+            Position += Velocity;
+            HitBox = new Rectangle((int)(Position.X - HitBoxWidth / 2), (int)(Position.Y - HitBoxHeight / 2), (int)HitBoxWidth, (int)HitBoxHeight);
 
-            if (isDebug) degbugHitBox.TranslateTo(hitBox.X, hitBox.Y);
+            if (isDebug) degbugHitBox.TranslateTo(HitBox.X, HitBox.Y);
         }
 
         public void Draw(SpriteBatch spriteBatch)
         {
-            spriteBatch.Draw(img, position - offset, sourceRec, Color.White, angle, origin, 1, SpriteEffects.None, 0);
+            spriteBatch.Draw(Img, Position - Offset, SrcRec, Color.White, Angle, Origin, 1, SpriteEffects.None, 0);
 
             // draw the hitbox
             if (isDebug)
             {
                 degbugHitBox.Draw(spriteBatch, Color.Red, false);
-                spriteBatch.DrawString(Assets.debugFont, velocity.ToString(), hitBox.Center.ToVector2() - new Vector2(10, 10), Color.White);
+                spriteBatch.DrawString(Assets.debugFont, Velocity.ToString(), HitBox.Center.ToVector2() - new Vector2(10, 10), Color.White);
             }
          }
     }

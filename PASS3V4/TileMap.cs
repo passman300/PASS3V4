@@ -8,6 +8,7 @@ using System.Linq;
 
 namespace PASS3V4
 {
+    /*
     public class TileMap
     {
         public TileLayer[] BackLayers { get; set; }
@@ -18,11 +19,6 @@ namespace PASS3V4
 
         public (Rectangle top, Rectangle bottom, Rectangle left, Rectangle right) DoorRec { get; set; }
 
-
-        private TileMapReader tileMapReader;
-
-        private int splitLayer;
-
         public static bool isDebug = false;
 
         public TileMap()
@@ -32,7 +28,7 @@ namespace PASS3V4
 
         public virtual void LoadTileMap(GraphicsDevice graphicsDevice, string filePath) 
         {
-            tileMapReader = new TileMapReader(filePath);
+            TileMapReader tileMapReader = new TileMapReader(filePath);
 
             tileMapReader.LoadTileMapFile(graphicsDevice);
 
@@ -74,4 +70,7 @@ namespace PASS3V4
             }
         }
     }
+    #endregion
+    */
+
 }

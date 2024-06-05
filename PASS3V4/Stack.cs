@@ -16,6 +16,12 @@ namespace PASS3V4
             return stack[^1];
         }
 
+        public T Top(int index)
+        {
+            if (stack.Count == 0) throw new Exception("Stack is empty.");
+            return stack[stack.Count - 1 - index];
+        }
+
         public T Pop()
         {
             if (stack.Count == 0) throw new Exception("Stack is empty.");

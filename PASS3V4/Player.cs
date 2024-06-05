@@ -10,7 +10,7 @@ namespace PASS3V4
 {
     public class Player : Entity
     {
-        public enum State
+        public enum PlayerState
         {
             Idle,
             Walk,
@@ -23,33 +23,31 @@ namespace PASS3V4
         const float SPEED_BASE = 4f;
         const float SPRINT_SCALE = 1.25f;
 
-        const int HURT_BOX_WIDTH = 32;
-        const int HURT_BOX_HEIGHT = 56;
-        const int HURT_BOX_OFFSET_X = 14;
-        const int HURT_BOX_OFFSET_Y = 8;
+        public const int HURT_BOX_WIdTH = 32;
+        public const int HURT_BOX_HEIGHT = 56;
+        public const int HURT_BOX_OFFSET_X = 14;
+        public const int HURT_BOX_OFFSET_Y = 8;
 
         const int FEET_OFFSET_X = 0;
         const int FEET_OFFSET_Y = 41;
         const int FEET_HEIGHT = 15;
-        const int FEET_WIDTH = 32;
+        const int FEET_WIdTH = 32;
 
         const int BREAD_CRUMB_DIST = 10;
         const int MAX_BREAD_CRUMBS = 10;
 
         const int NUM_WEAPONS = 2;
 
-        private State state = State.Idle;
-
-        private float health;
+        private PlayerState state = PlayerState.Idle;
 
         private Animation[] anim;
 
-        private List<Vector2> breadCrumbs = new();
+        private BreadCrumbs breadCrumbs = new();
 
         private Weapon[] weapons = new Weapon[NUM_WEAPONS];
         private int activeWeapon = 0;
 
-        public static bool isDebug = false;
+        public static bool isDebug = true;
 
         public Player(ContentManager content, GraphicsDevice graphicsDevice, string csvFilePath) : base(content, graphicsDevice)
         {
@@ -58,11 +56,11 @@ namespace PASS3V4
             // Load animations
             anim = Animation.LoadAnimations("AnimationSheets/" + csvFilePath, content);
 
-            hurtBox = new Rectangle((int)(HURT_BOX_OFFSET_X + position.X), (int)(HURT_BOX_OFFSET_Y + position.Y), HURT_BOX_WIDTH, HURT_BOX_HEIGHT);
+            hurtBox = new Rectangle((int)(HURT_BOX_OFFSET_X + position.X), (int)(HURT_BOX_OFFSET_Y + position.Y), HURT_BOX_WIdTH, HURT_BOX_HEIGHT);
 
-            feetRec = new Rectangle(hurtBox.X + FEET_OFFSET_X, hurtBox.Y + FEET_OFFSET_Y, FEET_WIDTH, FEET_HEIGHT);
+            feetRec = new Rectangle(hurtBox.X + FEET_OFFSET_X, hurtBox.Y + FEET_OFFSET_Y, FEET_WIdTH, FEET_HEIGHT);
 
-            speed = SPEED_BASE;
+            Speed = SPEED_BASE;
 
             debugFeetRec = new GameRectangle(graphicsDevice, feetRec);
             debugHurtBox = new GameRectangle(graphicsDevice, hurtBox);
@@ -79,7 +77,8 @@ namespace PASS3V4
 
         public (bool IsShot, Arrow Arrow) GetFlyingArrow()
         {
-            if (weapons[activeWeapon].GetType() == typeof(Bow)) return ((Bow)weapons[activeWeapon]).GetFlyingArrow();
+            if (weapons[activeWeapon].GetType() == typeof(Bow)) 
+                return ((Bow)weapons[activeWeapon]).GetFlyingArrow();
 
             return (false, null);
         }
@@ -90,13 +89,13 @@ namespace PASS3V4
 
             switch (state)
             {
-                case State.Idle:
+                case PlayerState.Idle:
                     UpdateIdle(gameTime, kb);
                     break;
-                case State.Walk:
+                case PlayerState.Walk:
                     UpdateWalk(gameTime, kb, wallRecs);
                     break;
-                case State.Run:
+                case PlayerState.Run:
                     UpdateWalk(gameTime, kb, wallRecs);
                     break;
             }
@@ -126,45 +125,50 @@ namespace PASS3V4
                 if (left && !right) direction = LEFT;
                 else if (right && !left) direction = RIGHT;
 
+                // check all cases for left right input
+                if ((right && left) || (!right && !left)) Velocity = new Vector2(0, Velocity.Y); // got to create new vector for properties
+                else if (right && !left) Velocity = new Vector2(1, Velocity.Y);
+                else if (left && !right) Velocity = new Vector2(-1, Velocity.Y);
 
-                if ((right && left) || (!right && !left)) velocity.X = 0;
-                else if (right && !left) velocity.X = 1;
-                else if (left && !right) velocity.X = -1;
-                if ((up && down) || (!up && !down)) velocity.Y = 0;
-                else if (up && !down) velocity.Y = -1;
-                else if (down && !up) velocity.Y = 1;
+                // check all cases for up down input
+                if ((up && down) || (!up && !down)) Velocity = new Vector2(Velocity.X, 0);
+                else if (up && !down) Velocity = new Vector2(Velocity.X, -1); 
+                else if (down && !up) Velocity = new Vector2(Velocity.X, 1);
 
-                if (velocity.LengthSquared() > 0)
+                if (Velocity.LengthSquared() > 0)
                 {
-                    velocity = Vector2.Normalize(velocity) * speed;
+                    Velocity = Vector2.Normalize(Velocity) * Speed;
 
-                    if (isSprinting) state = State.Run;
-                    else state = State.Walk;
+                    if (isSprinting) state = PlayerState.Run;
+                    else state = PlayerState.Walk;
                 }
 
-                if (isSprinting) velocity *= SPRINT_SCALE;
+                if (isSprinting) Velocity *= SPRINT_SCALE;
 
-                Move(wallRecs, velocity.X, velocity.Y);
+                Move(wallRecs, Velocity.X, Velocity.Y);
 
-                if (breadCrumbs.Count > MAX_BREAD_CRUMBS)
+                if (breadCrumbs.Size() > MAX_BREAD_CRUMBS)
                 {
-                    breadCrumbs.RemoveAt(0);
+                    breadCrumbs.Dequeue();
                 }
             }
-            else state = State.Idle;
+            else state = PlayerState.Idle;
         }
 
-        private void Move(Rectangle[] wallRecs, float x, float y)
+        protected override void Move(Rectangle[] wallRecs, float x, float y)
         {
-            // check the x and y movement separately
-            if (x != 0 && y != 0)
-            {
-                Move(wallRecs, 0, y);
-                Move(wallRecs, x, 0);
-                return;
-            }
+            base.Move(wallRecs, x, y);
+        }
 
-            position += CheckWallCollision(wallRecs, x, y).Velocity; 
+        protected override (bool IsCollided, Vector2 Velocity) CheckWallCollision(Rectangle[] wallRecs, float x, float y)
+        {
+            (bool isCollided, Vector2 velocity) temp = base.CheckWallCollision(wallRecs, x, y);
+
+            if (Math.Abs(temp.velocity.X) > Speed * (PlayerState.Run == state ? SPRINT_SCALE : 1)) temp.velocity.X = 0;
+
+            if (Math.Abs(temp.velocity.Y) > Speed * (PlayerState.Run == state ? SPRINT_SCALE : 1)) temp.velocity.Y = 0;
+
+            return temp;
         }
 
         /// <summary>
@@ -186,10 +190,10 @@ namespace PASS3V4
             }
             else if (direction == LEFT)
             {
-                hurtBox.X = (int)(position.X + anim[(int)state].GetDestRec().Width - HURT_BOX_OFFSET_X - HURT_BOX_WIDTH);
+                hurtBox.X = (int)(position.X + anim[(int)state].GetDestRec().Width - HURT_BOX_OFFSET_X - HURT_BOX_WIdTH);
                 hurtBox.Y = (int)(position.Y + HURT_BOX_OFFSET_Y);
 
-                feetRec.X = hurtBox.X + HURT_BOX_WIDTH - FEET_WIDTH - FEET_OFFSET_X;
+                feetRec.X = hurtBox.X + HURT_BOX_WIdTH - FEET_WIdTH - FEET_OFFSET_X;
                 feetRec.Y = hurtBox.Y + FEET_OFFSET_Y;
             }
 
@@ -205,7 +209,7 @@ namespace PASS3V4
 
         private void UpdateIdle(GameTime gameTime, KeyboardState kb)
         {
-            if ((kb.IsKeyDown(Keys.W) ^ kb.IsKeyDown(Keys.S)) || (kb.IsKeyDown(Keys.A) ^ kb.IsKeyDown(Keys.D))) state = State.Walk;
+            if ((kb.IsKeyDown(Keys.W) ^ kb.IsKeyDown(Keys.S)) || (kb.IsKeyDown(Keys.A) ^ kb.IsKeyDown(Keys.D))) state = PlayerState.Walk;
         }
 
         private void UpdateBreadCrumbs()
@@ -213,51 +217,17 @@ namespace PASS3V4
             // only update bread crumbs if the player is 3 or more pixels away from previous
             // don't use sqaure root because it's expensive, so it 9 pixels
 
-            if (breadCrumbs.Count == 0)
+            if (breadCrumbs.Size() == 0)
             {
-                breadCrumbs.Add(centerPosition);
+                breadCrumbs.Enqueue(centerPosition);
             }
 
-            else if (Vector2.DistanceSquared(centerPosition, breadCrumbs[^1]) >= Math.Pow(BREAD_CRUMB_DIST, 2))
+            else if (Vector2.DistanceSquared(centerPosition, breadCrumbs.PeekLast()) >= Math.Pow(BREAD_CRUMB_DIST, 2))
             {
-                breadCrumbs.Add(centerPosition);
+                breadCrumbs.Enqueue(centerPosition);
             }
         }
 
-        private (bool IsCollided, Vector2 Velocity) CheckWallCollision(Rectangle[] wallRecs, float x, float y)
-        {
-            float newX = x;
-            float newY = y;
-
-            bool isCollided = false;
-
-            Rectangle newFeetRec = new((int)(feetRec.X + x), (int)(feetRec.Y + y), feetRec.Width, feetRec.Height);
-
-            foreach (Rectangle rec in wallRecs)
-            {
-                if (newFeetRec.Intersects(rec))
-                {
-                    isCollided = true;
-
-                    if (x > 0 && (feetRec.X + x) + feetRec.Width > rec.Left) // Collision from the left
-                        newX = rec.Left - feetRec.Right;
-                    else if (x < 0 && (feetRec.X + x) < rec.Right) // Collision from the right
-                        newX = rec.Right - feetRec.Left;
-                    else if (y > 0 && feetRec.Y + y + feetRec.Height > rec.Top) // Collision from the top
-                        newY = rec.Top - feetRec.Bottom;
-                    else if (y < 0 && feetRec.Y + y < rec.Bottom) // Collision from the bottom
-                        newY = rec.Bottom - feetRec.Top;
-                }
-            }
-
-            if (Math.Abs(newX) > speed * (State.Run == state ? SPRINT_SCALE : 1))
-                newX = 0;
-
-            if (Math.Abs(newY) > speed * (State.Run == state ? SPRINT_SCALE : 1))
-                newY = 0;
-
-            return (isCollided, new Vector2(newX, newY));
-        }
 
         public override void Draw(SpriteBatch spriteBatch, bool filler = false)
         {
@@ -276,7 +246,7 @@ namespace PASS3V4
             {
                 spriteBatch.DrawString(Assets.debugFont, string.Format(" position: X: {0}, Y: {1}", position.X, position.Y), new Vector2(10, 10), Color.White);
                 spriteBatch.DrawString(Assets.debugFont, direction.ToString(), new Vector2(10, 30), Color.White);
-                spriteBatch.DrawString(Assets.debugFont, velocity.ToString(), new Vector2(10, 50), Color.White);
+                spriteBatch.DrawString(Assets.debugFont, Velocity.ToString(), new Vector2(10, 50), Color.White);
                 spriteBatch.DrawString(Assets.debugFont, weapons[activeWeapon].GetAngle().ToString(), new Vector2(10, 70), Color.White);
 
                 debugFeetRec.Draw(spriteBatch, Color.Red, false);
@@ -286,15 +256,33 @@ namespace PASS3V4
 
                 if (false)
                 {
-                    foreach (Vector2 v in breadCrumbs)
+                    foreach (Vector2 v in breadCrumbs.GetQueue())
                     {
                         spriteBatch.Draw(Assets.pixels, new Rectangle((int)v.X, (int)v.Y, 3, 3), Color.Red);
                     }
                 }
 
             }
+        }
 
+        public void MoveFeetCenterPosition(Vector2 newCenterPosition)
+        {
+            float x = newCenterPosition.X;
+            float y = newCenterPosition.Y;
 
+            feetRec.X = (int)(x - feetRec.Width / 2);
+            feetRec.Y = (int)(y - feetRec.Height / 2);
+
+            if (direction == RIGHT)
+            {
+                position.X = x - (float)FEET_WIdTH / 2 - FEET_OFFSET_X - HURT_BOX_OFFSET_X;
+                position.Y = y - (float)FEET_HEIGHT / 2 - FEET_OFFSET_Y - HURT_BOX_OFFSET_Y;
+            }
+            else if (direction == LEFT)
+            {
+                position.X = x - (float)FEET_WIdTH / 2 - (hurtBox.Width - FEET_WIdTH - FEET_OFFSET_X) - (anim[(int)state].GetDestRec().Width - HURT_BOX_WIdTH - HURT_BOX_OFFSET_X);
+                position.Y = y - (float)FEET_HEIGHT / 2 - FEET_OFFSET_Y - HURT_BOX_OFFSET_Y;
+            }
         }
 
 

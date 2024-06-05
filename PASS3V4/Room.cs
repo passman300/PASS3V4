@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -12,7 +13,7 @@ using Microsoft.Xna.Framework.Input;
 
 namespace PASS3V4
 {
-    public class Room : TileMap
+    public class Room
     {
         public struct AdjacentRooms
         {
@@ -21,13 +22,19 @@ namespace PASS3V4
             public (int x, int y) leftRoom;
             public (int x, int y) rightRoom;
 
-            public AdjacentRooms((int x, int y) topRoom, (int x, int y) bottomRoom, (int x, int y) leftRoom, (int x, int y) rightRoom)
+            public AdjacentRooms()
             {
-                this.topRoom = topRoom;
-                this.bottomRoom = bottomRoom;
-                this.leftRoom = leftRoom;
-                this.rightRoom = rightRoom;
+                topRoom = (-1, -1);
+                bottomRoom = (-1, -1);
+                leftRoom = (-1, -1);
+                rightRoom = (-1, -1);
+
+                //this.topRoom = topRoom;
+                //this.bottomRoom = bottomRoom;
+                //this.leftRoom = leftRoom;
+                //this.rightRoom = rightRoom;
             }
+
             public (int x, int y) SetTop((int x, int y) topRoom) => this.topRoom = topRoom;
             public (int x, int y) SetBottom((int x, int y) bottomRoom) => this.bottomRoom = bottomRoom;
             public (int x, int y) SetLeft((int x, int y) leftRoom) => this.leftRoom = leftRoom;
@@ -44,21 +51,32 @@ namespace PASS3V4
 
         public enum RoomType
         {
+            SpawnRoom,
+            ExitRoom,
             BasicRoom,
             BossRoom
         }
 
+        public const int SPAWN_OFFSET = 30;
+
+        public RoomType roomType;
+
         public AdjacentRooms adjacentRooms = new AdjacentRooms();
 
-        public IsDoorCollision isDoorCollision { get; set; }
+        public IsDoorCollision isDoorCollision = new IsDoorCollision();
 
-        private int mobSpawns;
+        public static RoomTemplatesManager roomTemplatesManager = new RoomTemplatesManager();
 
-        private Vector2 spawnPosition;
+        protected int mobSpawns;
+        protected List<Entity> mobs = new();
 
-        private List<Arrow> flyingArrows = new();
+        protected Vector2 spawnPosition;
 
-        public Room() : base()
+        protected List<Arrow> flyingArrows = new();
+
+        public static bool isDebug = true;
+
+        public Room()
         {
             // TDOD: Load room from file
             
@@ -70,18 +88,79 @@ namespace PASS3V4
              */
         }
 
-        public override void Update(GameTime gameTime, Player player, KeyboardState kb, KeyboardState prevKb, MouseState mouse, MouseState prevMouse)
+        public virtual void LoadRoom(GraphicsDevice graphicsDevice, string tileMapPath, string roomStatsPath, RoomType roomType)
         {
-            for (int i = 0; i < BackLayers.Length; i++)
+            LoadTileMap(graphicsDevice, tileMapPath, roomType);
+
+        }
+
+        public virtual void LoadTileMap(GraphicsDevice graphicsDevice, string filePath, RoomType roomType)
+        {
+            TileMapReader tileMapReader = new TileMapReader(filePath);
+
+            tileMapReader.LoadTileMapFile(graphicsDevice);
+
+            roomTemplatesManager.AddRoomTemplate(roomType, tileMapReader.GetRoomTemplate());
+
+            //BackLayers = tileMapReader.GetBackLayers();
+            //FrontLayers = tileMapReader.GetFrontLayers();
+            //WallRecs = tileMapReader.GetWallRecs();
+            //DoorRec = tileMapReader.GetDoorRec();
+        }
+
+        public virtual void Update(GameTime gameTime, Player player, KeyboardState kb, KeyboardState prevKb, MouseState mouse, MouseState prevMouse)
+        {
+            roomTemplatesManager.UpdateRoomTemplate(gameTime, roomType);
+
+            player.Update(gameTime, kb, prevKb, mouse, prevMouse, roomTemplatesManager.GetRoomTemplate(roomType).WallRecs.ToArray());
+
+            for (int i = 0; i < mobs.Count; i++)
             {
-                BackLayers[i].Update(gameTime);
-            }
-            for (int i = 0; i < FrontLayers.Length; i++)
-            {
-                FrontLayers[i].Update(gameTime);
+                mobs[i].Update(gameTime, kb, prevKb, mouse, prevMouse, roomTemplatesManager.GetRoomTemplate(roomType).WallRecs.ToArray());
+
+                if (mobs[i].IsDead)
+                {
+                    mobs.RemoveAt(i);
+                    i--;
+                }
             }
 
-            player.Update(gameTime, kb, prevKb, mouse, prevMouse, WallRecs);
+            // check if the player collides with one of the doors;
+            if (adjacentRooms.topRoom != (-1, -1) && roomTemplatesManager.GetRoomTemplate(roomType).DoorRecs.top.Intersects(player.GetFeetRec()))
+            {
+                isDoorCollision.top = true;
+                isDoorCollision.bottom = false;
+                isDoorCollision.left = false;
+                isDoorCollision.right = false;
+            }
+            else if (adjacentRooms.bottomRoom != (-1, -1) && roomTemplatesManager.GetRoomTemplate(roomType).DoorRecs.bottom.Intersects(player.GetFeetRec()))
+            {
+                isDoorCollision.top = false;
+                isDoorCollision.bottom = true;
+                isDoorCollision.left = false;
+                isDoorCollision.right = false;
+            }
+            else if (adjacentRooms.leftRoom != (-1, -1) && roomTemplatesManager.GetRoomTemplate(roomType).DoorRecs.left.Intersects(player.GetFeetRec()))
+            {
+                isDoorCollision.top = false;
+                isDoorCollision.bottom = false;
+                isDoorCollision.left = true;
+                isDoorCollision.right = false;
+            }
+            else if (adjacentRooms.rightRoom != (-1, -1) && roomTemplatesManager.GetRoomTemplate(roomType).DoorRecs.right.Intersects(player.GetFeetRec()))
+            {
+                isDoorCollision.top = false;
+                isDoorCollision.bottom = false;
+                isDoorCollision.left = false;
+                isDoorCollision.right = true;
+            }
+            else 
+            {
+                isDoorCollision.top = false;
+                isDoorCollision.bottom = false;
+                isDoorCollision.left = false;
+                isDoorCollision.right = false;
+            }
 
             if (player.GetFlyingArrow().IsShot) AddFlyingArrow(player.GetFlyingArrow().Arrow);
 
@@ -96,8 +175,8 @@ namespace PASS3V4
             {
                 flyingArrows[i].UpdateFlying();
 
-                if (flyingArrows[i].GetHitBox().Left > Game1.SCREEN_WIDTH || flyingArrows[i].GetHitBox().Right < 0 || 
-                    flyingArrows[i].GetHitBox().Top > Game1.SCREEN_HEIGHT || flyingArrows[i].GetHitBox().Bottom < 0)
+                if (flyingArrows[i].HitBox.Left > Game1.SCREEN_WIdTH || flyingArrows[i].HitBox.Right < 0 || 
+                    flyingArrows[i].HitBox.Top > Game1.SCREEN_HEIGHT || flyingArrows[i].HitBox.Bottom < 0)
                 {
                     flyingArrows.RemoveAt(i);
                     i--;
@@ -118,9 +197,56 @@ namespace PASS3V4
             }
         }
 
-        public override void DrawEntities(SpriteBatch spriteBatch)
+        public virtual void DrawEntities(SpriteBatch spriteBatch)
         {
             DrawFlyingArrows(spriteBatch);
+        }
+
+        public void DrawFront(SpriteBatch spriteBatch)
+        {
+            for (int i = 0; i < roomTemplatesManager.GetRoomTemplate(roomType).FrontLayers.Count; i++)
+            {
+                roomTemplatesManager.GetRoomTemplate(roomType).FrontLayers[i].Draw(spriteBatch);
+            }
+        }
+
+        public void DrawBack(SpriteBatch spriteBatch)
+        {
+            for (int i = 0; i < roomTemplatesManager.GetRoomTemplate(roomType).BackLayers.Count; i++)
+            {
+                roomTemplatesManager.GetRoomTemplate(roomType).BackLayers[i].Draw(spriteBatch);
+            }
+
+            DrawDoors(spriteBatch);
+        }
+
+        public void DrawDoors(SpriteBatch spriteBatch)
+        {
+
+            for (int i = 0; i < roomTemplatesManager.GetRoomTemplate(roomType).DoorLayers.Count; i++)
+            {
+                if (adjacentRooms.topRoom != (-1, -1) && roomTemplatesManager.GetRoomTemplate(roomType).DoorLayers[i].Name.Contains("Top"))
+                    roomTemplatesManager.GetRoomTemplate(roomType).DoorLayers[i].Draw(spriteBatch);
+                else if (adjacentRooms.bottomRoom != (-1, -1) && roomTemplatesManager.GetRoomTemplate(roomType).DoorLayers[i].Name.Contains("Bottom"))
+                    roomTemplatesManager.GetRoomTemplate(roomType).DoorLayers[i].Draw(spriteBatch);
+                else if (adjacentRooms.leftRoom != (-1, -1) && roomTemplatesManager.GetRoomTemplate(roomType).DoorLayers[i].Name.Contains("Left"))
+                    roomTemplatesManager.GetRoomTemplate(roomType).DoorLayers[i].Draw(spriteBatch);
+                else if (adjacentRooms.rightRoom != (-1, -1) && roomTemplatesManager.GetRoomTemplate(roomType).DoorLayers[i].Name.Contains("Right"))
+                    roomTemplatesManager.GetRoomTemplate(roomType).DoorLayers[i].Draw(spriteBatch);
+            }
+        }
+
+        public void DrawWallHitboxes(SpriteBatch spriteBatch)
+        {
+            for (int i = 0; i < roomTemplatesManager.GetRoomTemplate(roomType).WallRecs.Count; i++)
+            {
+                spriteBatch.Draw(Assets.pixels, roomTemplatesManager.GetRoomTemplate(roomType).WallRecs[i], Color.Blue * 0.2f);
+            }
+
+            if (adjacentRooms.topRoom != (-1, -1)) spriteBatch.Draw(Assets.pixels, roomTemplatesManager.GetRoomTemplate(roomType).DoorRecs.top, Color.Pink * 0.9f);
+            if (adjacentRooms.bottomRoom != (-1, -1)) spriteBatch.Draw(Assets.pixels, roomTemplatesManager.GetRoomTemplate(roomType).DoorRecs.bottom, Color.Pink * 0.9f);
+            if (adjacentRooms.leftRoom != (-1, -1)) spriteBatch.Draw(Assets.pixels, roomTemplatesManager.GetRoomTemplate(roomType).DoorRecs.left, Color.Pink * 0.9f);
+            if (adjacentRooms.rightRoom != (-1, -1)) spriteBatch.Draw(Assets.pixels, roomTemplatesManager.GetRoomTemplate(roomType).DoorRecs.right, Color.Pink * 0.9f);
         }
     }
 }

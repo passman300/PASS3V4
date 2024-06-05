@@ -4,6 +4,7 @@ using Microsoft.Xna.Framework.Graphics;
 using System;
 using System.Collections.Generic;
 
+
 namespace PASS3V4
 {
     public class Tile
@@ -14,107 +15,100 @@ namespace PASS3V4
             Animated
         }
 
-        public const int WIDTH = 32;
+        public const int WIdTH = 32;
         public const int HEIGHT = 32;
 
-        private List<Texture2D> tileImg = new List<Texture2D>();
+        protected Texture2D tileImg;
 
-        private int tileIDperRow;
-        private OrderedSet<int> tileID = new OrderedSet<int>();
+        protected int tileIdPerRow;
+        protected int tileId;
 
-        private Rectangle boundingBox;
-        private List<Rectangle> hitBoxs = new List<Rectangle>();
+        protected Rectangle boundingBox;
+        protected List<Rectangle> hitBoxes;
 
-        private Dictionary<Properties, bool> properties = new Dictionary<Properties, bool>();
+        protected Dictionary<Properties, bool> properties;
 
-        private int collisionDamage;
+        protected int collisionDamage;
 
-        private Timer frameDuration;
+        protected GameRectangle debugBounding;
 
-        private int curFrame;
-
-        private GameRectangle degbugBounding;
-
-        private List<GameRectangle> debugHitBoxs = new List<GameRectangle>();
+        protected List<GameRectangle> debugHitBoxes;
 
         public static bool isDebug = false;
 
-        public Tile(GraphicsDevice graphicsDevice, Texture2D tileSetImg, int tileID, Vector3 position, TileTemplate tileTemplate)
+        public Tile(GraphicsDevice graphicsDevice, Texture2D tileSetImg, int tileId, Vector3 position, TileTemplate tileTemplate)
         {
+            this.hitBoxes = new List<Rectangle>();
+            this.properties = new Dictionary<Properties, bool>();
+
+            if (isDebug) debugHitBoxes = new List<GameRectangle>();
+
             if (tileTemplate.Frames.Count > 0)
-                this.tileID = tileTemplate.Frames;
-            this.tileID.Add(tileID);
+            {
+                ;
+            }
+            else this.tileId = tileId;
 
             properties[Properties.Collision] = tileTemplate.IsCollision;
             collisionDamage = tileTemplate.Damage;
 
             properties[Properties.Animated] = tileTemplate.IsAnimated;
-            frameDuration = new Timer(tileTemplate.AnimationDur, true);
-            curFrame = 0;
 
             // set up the tile image
-            SetTileImages(graphicsDevice, tileSetImg, this.tileID);
+            if (!properties[Properties.Animated]) 
+                SetTileImages(graphicsDevice, tileSetImg, this.tileId);
 
             // set up the hitbox
-            boundingBox = new Rectangle((int)position.X, (int)position.Y, WIDTH, HEIGHT);
+            boundingBox = new Rectangle((int)position.X, (int)position.Y, WIdTH, HEIGHT);
 
-            foreach (Rectangle hitBox in tileTemplate.HitBoxs)
+            foreach (Rectangle hitBox in tileTemplate.HitBoxes)
             {
-                hitBoxs.Add(new Rectangle((int)(hitBox.X + position.X), (int)(hitBox.Y + position.Y), hitBox.Width, hitBox.Height));
-                if (isDebug) debugHitBoxs.Add(new GameRectangle(graphicsDevice, hitBoxs[hitBoxs.Count - 1]));
+                hitBoxes.Add(new Rectangle((int)(hitBox.X + position.X), (int)(hitBox.Y + position.Y), hitBox.Width, hitBox.Height));
+                if (isDebug) debugHitBoxes.Add(new GameRectangle(graphicsDevice, hitBoxes[hitBoxes.Count - 1]));
             }
 
-            if (isDebug) degbugBounding = new GameRectangle(graphicsDevice, boundingBox);
+            if (isDebug) debugBounding = new GameRectangle(graphicsDevice, boundingBox);
         }
 
         public Rectangle GetBoundingBox() { return boundingBox; }
 
-        public Rectangle[] GetHitBoxes() { return hitBoxs.ToArray(); }
+        public Rectangle[] GetHitBoxes() { return hitBoxes.ToArray(); }
 
         public Dictionary<Properties, bool> GetProperties() { return properties; }
 
-        private void SetTileImages(GraphicsDevice graphicsDevice, Texture2D tileSetImg, OrderedSet<int> tileID)
+
+
+        protected virtual void SetTileImages(GraphicsDevice graphicsDevice, Texture2D tileSetImg, int tileId)
         {
-            tileIDperRow = tileSetImg.Width / WIDTH;
+            tileIdPerRow = tileSetImg.Width / WIdTH;
 
-            Rectangle sourceRec = new Rectangle(0, 0, WIDTH, HEIGHT);
+            Rectangle sourceRec = new Rectangle(0, 0, WIdTH, HEIGHT);
 
-            foreach (int t in tileID)
-            {
-                // note: tileID, row and col is 0 indexed
-                int row = t / tileIDperRow;
-                int col = t % tileIDperRow;
+            // note: tileId, row and col is 0 indexed
+            int row = tileId / tileIdPerRow;
+            int col = tileId % tileIdPerRow;
 
-                //Rectangle sourceRec = new Rectangle(col * WIDTH, row * HEIGHT, WIDTH, HEIGHT);
-                sourceRec.X = col * WIDTH;
-                sourceRec.Y = row * HEIGHT;
+            //Rectangle sourceRec = new Rectangle(col * WIdTH, row * HEIGHT, WIdTH, HEIGHT);
+            sourceRec.X = col * WIdTH;
+            sourceRec.Y = row * HEIGHT;
 
-                tileImg.Add(Util.Crop(tileSetImg, sourceRec));
-            }
+            tileImg = Util.Crop(tileSetImg, sourceRec);
         }
 
-        public void Update(GameTime gameTime)
+        public virtual void Update(GameTime gameTime)
         {
-            frameDuration.Update(gameTime);
-
-            if (properties[Properties.Animated] && frameDuration.IsFinished())
-            {
-                curFrame = (curFrame + 1) % tileID.Count;
-
-                frameDuration.ResetTimer(true);
-            }
+            // image is still
         }
 
-        public void Draw(SpriteBatch spriteBatch)
+        public virtual void Draw(SpriteBatch spriteBatch)
         {
-            spriteBatch.Draw(tileImg[curFrame], boundingBox, Color.White);
-
+            spriteBatch.Draw(tileImg, boundingBox, Color.White);
 
             if (isDebug)
             {
                 if (properties[Properties.Collision])
                 {
-                    foreach (GameRectangle hitBox in debugHitBoxs)
+                    foreach (GameRectangle hitBox in debugHitBoxes)
                     {
                         hitBox.Draw(spriteBatch, Color.Blue, true);
                     }

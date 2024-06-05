@@ -7,7 +7,7 @@ namespace PASS3V4
 {
     public class Game1 : Game
     {
-        public const int SCREEN_WIDTH = 960;
+        public const int SCREEN_WIdTH = 960;
         public const int SCREEN_HEIGHT = 800;
 
         private GraphicsDeviceManager graphics;
@@ -16,6 +16,7 @@ namespace PASS3V4
         public static Random rng = new Random();
 
         Level level;
+        //Room room;
         Player player;
 
         Rectangle tempRec = new Rectangle(480, 400, 90, 50);
@@ -47,7 +48,7 @@ namespace PASS3V4
         protected override void Initialize()
         {
             // TODO: Add your initialization logic here
-            graphics.PreferredBackBufferWidth = SCREEN_WIDTH;
+            graphics.PreferredBackBufferWidth = SCREEN_WIdTH;
             graphics.PreferredBackBufferHeight = SCREEN_HEIGHT;
 
             IsFixedTimeStep = true;
@@ -68,7 +69,10 @@ namespace PASS3V4
             Assets.Content = Content;
             Assets.Initialize();
 
-            level = new Level(1);
+            //room = new Room();
+            //room.LoadTileMap(GraphicsDevice, "Tiled/BasicRoom.tmx");
+
+            level = new Level(3);
             level.Generate(GraphicsDevice);
 
             player = new Player(Content, GraphicsDevice, "Player/Player.csv");
@@ -84,6 +88,8 @@ namespace PASS3V4
 
             prevMouse = mouse;
             mouse = Mouse.GetState();
+
+            //room.Update(gameTime, player, kb, prevKb, mouse, prevMouse);
 
             level.Update(gameTime, player, kb, prevKb, mouse, prevMouse);
 
@@ -112,6 +118,11 @@ namespace PASS3V4
                 GraphicsDevice.Clear(Color.Black);
 
                 spriteBatch.Begin();
+
+                //room.DrawBack(spriteBatch);
+                //player.Draw(spriteBatch, false);
+                //room.DrawFront(spriteBatch);
+                //room.DrawEntities(spriteBatch);
 
                 level.Draw(spriteBatch, player);
 
