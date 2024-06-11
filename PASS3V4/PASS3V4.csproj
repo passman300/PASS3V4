@@ -11,6 +11,14 @@
     <ApplicationIcon>Icon.ico</ApplicationIcon>
   </PropertyGroup>
   <ItemGroup>
+    <Compile Remove="bin\**" />
+    <EmbeddedResource Remove="bin\**" />
+    <None Remove="bin\**" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Remove="Node.cs" />
+  </ItemGroup>
+  <ItemGroup>
     <None Remove="Icon.ico" />
     <None Remove="Icon.bmp" />
   </ItemGroup>
@@ -33,14 +41,12 @@
     <PackageReference Include="MonoGame.Content.Builder.Task" Version="3.8.1.303" />
   </ItemGroup>
   <ItemGroup>
-    <Folder Include="bin\Debug\net6.0\AnimationSheets\" />
+    <Folder Include="Content\Images\Sprites\UI\" />
     <Folder Include="Content\Images\Sprites\Weapons\" />
     <Folder Include="Libaries\" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="bin\Debug\net6.0\Tiled\BasicRoom.tmx">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
+    <None Include="Data Structures\Node.cs" />
     <None Include="obj\Debug\net6.0\apphost.exe" />
     <None Include="obj\Debug\net6.0\PASS3V4.AssemblyInfoInputs.cache" />
     <None Include="obj\Debug\net6.0\PASS3V4.assets.cache" />

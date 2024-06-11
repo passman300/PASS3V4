@@ -1,29 +1,64 @@
-﻿using Microsoft.Xna.Framework.Content;
+﻿//Author: Colin Wang, based on Alexander Protuc Assets class
+//File Name: Assets.cs
+//Project Name: PASS3 a dungeon crawler
+//Created Date: March 20, 2024, Remade on April 1, 2024, Modified on May 12 2024 for this project
+//Modified Date: June 6, 2024
+//Description: Assets class for the game, loads all assets (fonts, images, sounds, etc.) to the game
+
+using Microsoft.Xna.Framework.Content;
 using Microsoft.Xna.Framework.Graphics;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace PASS3V4
 {
     public class Assets
     {
+        // local content manager
         public static ContentManager Content { get; set; }
 
         private static string loadPath; // path to load assets from
 
-        // fonts
-        public static SpriteFont debugFont;
+        #region Fonts
+        public static SpriteFont debugFont; // debug font
 
-        // images
-        public static Texture2D pixels;
+        #endregion
+
+        #region Images
+        #region Misc
+        // blank pixel
+        public static Texture2D pixel;
+
+        // tile set image
         public static Texture2D dungeonTileSetImg;
 
-        public static Texture2D weaponSetImg;
 
-        // audio  78i68u
+
+        #endregion
+
+        #region Sprites
+        #region MobSprites
+        public static Texture2D skullImg; // skull image
+        #endregion
+
+        #region Player
+        // if you are looking for the player sprite, it is loaded in Player.cs when initializing the animation 
+        #endregion
+
+        #region Weapons
+        public static Texture2D weaponSetImg; // weapon set image
+        public static Texture2D fireballImg; // fireball image
+        #endregion
+
+        #region UI
+        public static Texture2D frameImg; // health frame image
+        public static Texture2D barImg; // health bar image
+        #endregion
+
+
+        #endregion
+
+        #endregion
+
+        // audio 
 
 
         // songs
@@ -33,20 +68,38 @@ namespace PASS3V4
         /// </summary>
         public static void Initialize()
         {
-            // load fonts
+            #region Fonts
             loadPath = "Fonts";
 
             debugFont = Load<SpriteFont>("DebugFont");
 
+            #endregion
 
-            // load all images
-            loadPath = "Images/Sprites";
+            #region Images
 
-            pixels = Load<Texture2D>("BlankPixel");
-
+            #region Misc
             loadPath = "Images/Tileset";
             dungeonTileSetImg = Load<Texture2D>("RotatedSetImage");
-            weaponSetImg = Load<Texture2D>("WeaponsSetImage");
+            #endregion
+
+            #region Sprites
+            loadPath = "Images/Sprites";
+
+            // mob sprites
+            skullImg = Load<Texture2D>("Enemies/Skull");
+
+            // weapon set image
+            weaponSetImg = Load<Texture2D>("Weapons/WeaponsSetImage");
+            fireballImg = Load<Texture2D>("Weapons/Fireball");
+
+            // blank pixel
+            pixel = Load<Texture2D>("BlankPixel");
+
+            // UI
+            frameImg = Load<Texture2D>("UI/HealthFrameImage");
+            barImg = Load<Texture2D>("UI/HealthBarImage");
+            #endregion
+            #endregion
         }
 
         /// <summary>

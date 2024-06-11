@@ -3,7 +3,7 @@
   <Class Name="PASS3V4.Game1">
     <Position X="15.25" Y="1.25" Width="1.5" />
     <TypeIdentifier>
-      <HashCode>AAQEBEAAAAAAAwIRAIABAEAgAAEAAAgBAAAQCAgAAAQ=</HashCode>
+      <HashCode>AAQEBEAAAAAAIwIQAIABAUAgAAEAAAkBAAAQCAgAAAQ=</HashCode>
       <FileName>Game1.cs</FileName>
     </TypeIdentifier>
     <ShowAsAssociation>
@@ -24,14 +24,14 @@
       </Enum>
     </NestedTypes>
     <TypeIdentifier>
-      <HashCode>bACEADCQQAAAEhQAQAAEJQAACAAAQQAAAAQAQABgAAA=</HashCode>
+      <HashCode>AAAAADAQAAQAEAAQAAACAAAAAAAAAAAAAAAAAAgAAAA=</HashCode>
       <FileName>Arrow.cs</FileName>
     </TypeIdentifier>
   </Class>
   <Class Name="PASS3V4.Assets">
     <Position X="22.75" Y="25" Width="1.5" />
     <TypeIdentifier>
-      <HashCode>AAAAgAAAAgAAAQEIAAAAgAAAAAEAAAAAAAAIAAAAAAA=</HashCode>
+      <HashCode>AAAAgAAAAgAAAQEIAAAAgAAAAQEAAAAAAAAIAAAAAAA=</HashCode>
       <FileName>Assets.cs</FileName>
     </TypeIdentifier>
   </Class>
@@ -48,7 +48,7 @@
       </Enum>
     </NestedTypes>
     <TypeIdentifier>
-      <HashCode>ICQEAAAAAABAAgYAAAAAAAAABAAAAAAESEAAAgAgAgA=</HashCode>
+      <HashCode>ACQAAAAAAARAAgoQAAACAAAABABAAAAESEAAAgAAAgA=</HashCode>
       <FileName>Bow.cs</FileName>
     </TypeIdentifier>
     <ShowAsAssociation>
@@ -59,19 +59,19 @@
   <Class Name="PASS3V4.BreadCrumbs">
     <Position X="35.75" Y="12.25" Width="1.5" />
     <TypeIdentifier>
-      <HashCode>AAAAAAAAAAAAAAAAAAQAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAABAAAA=</HashCode>
       <FileName>BreadCrumbs.cs</FileName>
     </TypeIdentifier>
   </Class>
   <Class Name="PASS3V4.Entity">
     <Position X="2.5" Y="16.25" Width="1.5" />
     <TypeIdentifier>
-      <HashCode>QAQAIAKAAqAAOgAAIIAANCUBAAAAAgQgQAAACABUAAI=</HashCode>
+      <HashCode>QAQEAAKIAqAAOgAAIIAANSUBAACAAgwgQQAACABUAhI=</HashCode>
       <FileName>Entity.cs</FileName>
     </TypeIdentifier>
   </Class>
   <Class Name="PASS3V4.ExitRoom">
-    <Position X="15" Y="21.5" Width="1.5" />
+    <Position X="15.25" Y="22" Width="1.5" />
     <TypeIdentifier>
       <HashCode>AAAAAAAAAAAAAAAAAAAAAAEAAAAAAAAAAAAAAAAAAAA=</HashCode>
       <FileName>ExitRoom.cs</FileName>
@@ -80,7 +80,7 @@
   <Class Name="PASS3V4.LargeSword">
     <Position X="28.25" Y="22.5" Width="1.5" />
     <TypeIdentifier>
-      <HashCode>IAAEAAAAAgAAAAQAAAAAAAAAAAAAAAAAAAAAAAAgAgA=</HashCode>
+      <HashCode>AAAAAAAAAgQAAAAQAAACAAAAAAAAAAAAAAAAAAAAAgA=</HashCode>
       <FileName>LargeSword.cs</FileName>
     </TypeIdentifier>
   </Class>
@@ -100,6 +100,11 @@
       <Compartment Name="Nested Types" Collapsed="false" />
     </Compartments>
     <NestedTypes>
+      <Class Name="PASS3V4.Mob.Frames" Collapsed="true">
+        <TypeIdentifier>
+          <NewMemberFileName>Mob.cs</NewMemberFileName>
+        </TypeIdentifier>
+      </Class>
       <Enum Name="PASS3V4.Mob.MobType" Collapsed="true">
         <TypeIdentifier>
           <NewMemberFileName>Mob.cs</NewMemberFileName>
@@ -112,7 +117,7 @@
       </Enum>
     </NestedTypes>
     <TypeIdentifier>
-      <HashCode>AAAAAAAAAIAACAAABAAAAAAAAAAAAAAAAQAABAAAAAA=</HashCode>
+      <HashCode>AAQAAAAAAIAACgAABAAAAAAAAAAABAAAAQAABQAAAAA=</HashCode>
       <FileName>Mob.cs</FileName>
     </TypeIdentifier>
   </Class>
@@ -143,12 +148,12 @@
         <Point X="15.792" Y="6.867" Type="JumpStart" />
         <Point X="15.958" Y="6.867" Type="JumpEnd" />
         <Point X="24.632" Y="6.867" />
-        <Point X="24.632" Y="8.75" />
-        <Point X="29.5" Y="8.75" />
+        <Point X="24.632" Y="8.712" />
+        <Point X="29.5" Y="8.712" />
       </Path>
     </InheritanceLine>
     <TypeIdentifier>
-      <HashCode>AC4AEACQAKAAAgAAAIBEAABhAAAAgEgUQwBAOAAAABA=</HashCode>
+      <HashCode>AC4AEACQAIIAAwAACIAEAABhAAAAgEAUQgBAOAAAAAA=</HashCode>
       <FileName>Player.cs</FileName>
     </TypeIdentifier>
     <ShowAsAssociation>
@@ -160,7 +165,7 @@
     <Position X="36" Y="29.25" Width="1.5" />
     <TypeIdentifier>
       <HashCode>AABAACAAAAAEgAAAAABAAAAAAAAABAAAAAAAAAAAAAA=</HashCode>
-      <FileName>Queue.cs</FileName>
+      <FileName>Data Structures\Queue.cs</FileName>
     </TypeIdentifier>
   </Class>
   <Class Name="PASS3V4.Room">
@@ -187,25 +192,30 @@
     </NestedTypes>
     <AssociationLine Name="roomTemplatesManager" Type="PASS3V4.RoomTemplatesManager" ManuallyRouted="true" FixedFromPoint="true" FixedToPoint="true">
       <Path>
-        <Point X="15" Y="17.125" />
-        <Point X="9.625" Y="17.125" />
+        <Point X="15" Y="17.221" />
+        <Point X="9.625" Y="17.221" />
         <Point X="9.625" Y="22.75" />
       </Path>
     </AssociationLine>
     <TypeIdentifier>
-      <HashCode>ACQAIAAIAkIACABAACA0AAIQAAAAAgAAAEABAAAIAgA=</HashCode>
+      <HashCode>ACQAAAIMAkIASARAAAA0AAYQAAAAAgQAAABBAAAIAgA=</HashCode>
       <FileName>Room.cs</FileName>
     </TypeIdentifier>
     <ShowAsAssociation>
       <Field Name="roomTemplatesManager" />
     </ShowAsAssociation>
-    <ShowAsCollectionAssociation>
-      <Field Name="flyingArrows" />
-      <Field Name="mobs" />
-    </ShowAsCollectionAssociation>
   </Class>
   <Class Name="PASS3V4.RoomTemplate">
     <Position X="7.5" Y="25.5" Width="3" />
+    <AssociationLine Name="FrontLayers" Type="PASS3V4.TileLayer" FixedFromPoint="true">
+      <Path>
+        <Point X="7.75" Y="28.66" />
+        <Point X="7.75" Y="30.25" />
+      </Path>
+      <MemberNameLabel ManuallyPlaced="true">
+        <Position X="0.149" Y="0.15" />
+      </MemberNameLabel>
+    </AssociationLine>
     <AssociationLine Name="BackLayers" Type="PASS3V4.TileLayer">
       <MemberNameLabel ManuallyPlaced="true">
         <Position X="0.058" Y="0.138" />
@@ -213,30 +223,21 @@
     </AssociationLine>
     <AssociationLine Name="DoorLayers" Type="PASS3V4.TileLayer" FixedFromPoint="true">
       <Path>
-        <Point X="10.125" Y="28.276" />
+        <Point X="10.125" Y="28.66" />
         <Point X="10.125" Y="30.25" />
       </Path>
       <MemberNameLabel ManuallyPlaced="true">
         <Position X="0.123" Y="0.163" />
       </MemberNameLabel>
     </AssociationLine>
-    <AssociationLine Name="FrontLayers" Type="PASS3V4.TileLayer" FixedFromPoint="true">
-      <Path>
-        <Point X="7.75" Y="28.276" />
-        <Point X="7.75" Y="30.25" />
-      </Path>
-      <MemberNameLabel ManuallyPlaced="true">
-        <Position X="0.149" Y="0.15" />
-      </MemberNameLabel>
-    </AssociationLine>
     <TypeIdentifier>
-      <HashCode>AAQAAAAgAAAAAAADAAQAAIAAAAAAACAAAgAAAAAAAEg=</HashCode>
+      <HashCode>AAQAAAAgAAAAAAADAEQAAIAAgAAAACAAAgAAAAAAAEg=</HashCode>
       <FileName>RoomTemplate.cs</FileName>
     </TypeIdentifier>
     <ShowAsCollectionAssociation>
+      <Property Name="FrontLayers" />
       <Property Name="BackLayers" />
       <Property Name="DoorLayers" />
-      <Property Name="FrontLayers" />
     </ShowAsCollectionAssociation>
   </Class>
   <Class Name="PASS3V4.RoomTemplatesManager">
@@ -248,13 +249,6 @@
     <ShowAsCollectionAssociation>
       <Field Name="roomTemplates" />
     </ShowAsCollectionAssociation>
-  </Class>
-  <Class Name="PASS3V4.Skeleton">
-    <Position X="6.75" Y="16.5" Width="1.5" />
-    <TypeIdentifier>
-      <HashCode>AAAAAAAAAAQAAAAAAAgAAAAAAAEAAAAAIAAAAAAAAgA=</HashCode>
-      <FileName>Skeleton.cs</FileName>
-    </TypeIdentifier>
   </Class>
   <Class Name="PASS3V4.Stack&lt;T&gt;">
     <Position X="32.5" Y="29.25" Width="1.5" />
@@ -278,7 +272,6 @@
     </TypeIdentifier>
     <ShowAsAssociation>
       <Field Name="roomTemplate" />
-      <Field Name="tokenStack" />
     </ShowAsAssociation>
     <ShowAsCollectionAssociation>
       <Field Name="tileSets" />
@@ -290,9 +283,6 @@
       <HashCode>AAAAAJAAAAAAAQQQUAAABRAAgCAkAEAFAAAAAAAwAAE=</HashCode>
       <FileName>TileSetFileIO.cs</FileName>
     </TypeIdentifier>
-    <ShowAsAssociation>
-      <Field Name="tokenStack" />
-    </ShowAsAssociation>
     <ShowAsCollectionAssociation>
       <Field Name="tileDict" />
     </ShowAsCollectionAssociation>
@@ -303,9 +293,6 @@
       <HashCode>AAAAAAAAAAAAAQQAQAAAIRAAAAAkAEAEAgAAAAAQAAE=</HashCode>
       <FileName>TilesSetXML.cs</FileName>
     </TypeIdentifier>
-    <ShowAsAssociation>
-      <Field Name="tokenStack" />
-    </ShowAsAssociation>
     <ShowAsCollectionAssociation>
       <Field Name="TileDict" />
     </ShowAsCollectionAssociation>
@@ -370,6 +357,13 @@
     <TypeIdentifier>
       <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
       <FileName>BasicRoom.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="PASS3V4.Skull">
+    <Position X="6.75" Y="16.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAQAAAAAAAQAAAAACAgAAABgAgEAgEAQIABAKAAAAgA=</HashCode>
+      <FileName>Skull.cs</FileName>
     </TypeIdentifier>
   </Class>
   <Font Name="Segoe UI" Size="9" />

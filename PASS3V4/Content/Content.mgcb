@@ -68,7 +68,7 @@
 /processorParam:TextureFormat=Color
 /build:Images/Sprites/Enemies/Golem.png
 
-#begin Images/Sprites/Enemies/Skeleton.png
+#begin Images/Sprites/Enemies/Skull.png
 /importer:TextureImporter
 /processor:TextureProcessor
 /processorParam:ColorKeyColor=255,0,255,255
@@ -78,7 +78,7 @@
 /processorParam:ResizeToPowerOfTwo=False
 /processorParam:MakeSquare=False
 /processorParam:TextureFormat=Color
-/build:Images/Sprites/Enemies/Skeleton.png
+/build:Images/Sprites/Enemies/Skull.png
 
 #begin Images/Sprites/Enemies/Slime.png
 /importer:TextureImporter
@@ -116,6 +116,54 @@
 /processorParam:TextureFormat=Color
 /build:Images/Sprites/Player.png
 
+#begin Images/Sprites/UI/HealthBarImage.png
+/importer:TextureImporter
+/processor:TextureProcessor
+/processorParam:ColorKeyColor=255,0,255,255
+/processorParam:ColorKeyEnabled=True
+/processorParam:GenerateMipmaps=False
+/processorParam:PremultiplyAlpha=True
+/processorParam:ResizeToPowerOfTwo=False
+/processorParam:MakeSquare=False
+/processorParam:TextureFormat=Color
+/build:Images/Sprites/UI/HealthBarImage.png
+
+#begin Images/Sprites/UI/HealthFrameImage.png
+/importer:TextureImporter
+/processor:TextureProcessor
+/processorParam:ColorKeyColor=255,0,255,255
+/processorParam:ColorKeyEnabled=True
+/processorParam:GenerateMipmaps=False
+/processorParam:PremultiplyAlpha=True
+/processorParam:ResizeToPowerOfTwo=False
+/processorParam:MakeSquare=False
+/processorParam:TextureFormat=Color
+/build:Images/Sprites/UI/HealthFrameImage.png
+
+#begin Images/Sprites/Weapons/FireBall.png
+/importer:TextureImporter
+/processor:TextureProcessor
+/processorParam:ColorKeyColor=255,0,255,255
+/processorParam:ColorKeyEnabled=True
+/processorParam:GenerateMipmaps=False
+/processorParam:PremultiplyAlpha=True
+/processorParam:ResizeToPowerOfTwo=False
+/processorParam:MakeSquare=False
+/processorParam:TextureFormat=Color
+/build:Images/Sprites/Weapons/FireBall.png
+
+#begin Images/Sprites/Weapons/WeaponsSetImage.png
+/importer:TextureImporter
+/processor:TextureProcessor
+/processorParam:ColorKeyColor=255,0,255,255
+/processorParam:ColorKeyEnabled=True
+/processorParam:GenerateMipmaps=False
+/processorParam:PremultiplyAlpha=True
+/processorParam:ResizeToPowerOfTwo=False
+/processorParam:MakeSquare=False
+/processorParam:TextureFormat=Color
+/build:Images/Sprites/Weapons/WeaponsSetImage.png
+
 #begin Images/TileSet/RotatedSetImage.png
 /importer:TextureImporter
 /processor:TextureProcessor
@@ -127,16 +175,4 @@
 /processorParam:MakeSquare=False
 /processorParam:TextureFormat=Color
 /build:Images/TileSet/RotatedSetImage.png
-
-#begin Images/TileSet/WeaponsSetImage.png
-/importer:TextureImporter
-/processor:TextureProcessor
-/processorParam:ColorKeyColor=255,0,255,255
-/processorParam:ColorKeyEnabled=True
-/processorParam:GenerateMipmaps=False
-/processorParam:PremultiplyAlpha=True
-/processorParam:ResizeToPowerOfTwo=False
-/processorParam:MakeSquare=False
-/processorParam:TextureFormat=Color
-/build:Images/TileSet/WeaponsSetImage.png
 
